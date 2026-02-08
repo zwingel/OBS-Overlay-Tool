@@ -14,7 +14,7 @@ Dynamic Countdown/up: Perfect for breaks or "Starting Soon" scenes, featuring a 
 
 Quick Branding (CI): Save your primary and secondary colors and apply them to all elements with a single click.
 
-[Work in Progress] Bilingual: Switch the entire interface between English and German.
+Bilingual: Switch the entire interface between English and German.
 
 🚀 How to use it with OBS
 Launch the App: Open the OBS Overlay Tool on your computer.
@@ -38,10 +38,7 @@ Install dependencies: npm install
 
 Run it: npm start
 
-📂 Structure at a glance
-app/: The core Electron application.
 
-defaults/: Master templates for the server, control panel, overlays and translations.
 
 📜 License
 MIT License - Use it, change it, and have fun with your streams!
