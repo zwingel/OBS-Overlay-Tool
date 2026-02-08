@@ -2,13 +2,26 @@ const { app, BrowserWindow } = require("electron");
 const path = require("path");
 const fs = require("fs");
 const { spawn } = require("child_process");
+
 const APP_VERSION = app.getVersion();
 const isDev = !app.isPackaged;
+
 let mainWindow = null;
 let isQuitting = false;
 let serverProc = null;
 
 console.log("Dev mode:", isDev);
+
+// ✅ Helpers müssen OUTSIDE stehen
+function copyForce(src, dst) {
+  ensureDir(path.dirname(dst));
+  fs.copyFileSync(src, dst);
+}
+
+function copyIfMissing(src, dst) {
+  ensureDir(path.dirname(dst));
+  if (!fs.existsSync(dst)) fs.copyFileSync(src, dst);
+}
 
 function prepareWorkspace() {
   const ws = getWorkspaceDir();
@@ -20,33 +33,29 @@ function prepareWorkspace() {
     workspaceVersion = String(fs.readFileSync(versionFile, "utf8") || "").trim();
   }
 
-  // RELEASE: Workspace nur bei Versionswechsel komplett neu
-  if (!isDev && workspaceVersion !== APP_VERSION) {
+  const isUpdate = (!isDev && workspaceVersion !== APP_VERSION);
+
+  if (isUpdate) {
     console.log("Workspace update needed:", workspaceVersion, "→", APP_VERSION);
-
-    fs.rmSync(ws, { recursive: true, force: true });
-    fs.mkdirSync(ws, { recursive: true });
-
-    fs.writeFileSync(versionFile, APP_VERSION, "utf8");
+    // optional: hier könntest du Backup machen (nur code-Dateien)
   }
 
-  // RELEASE: falls .version fehlt (z.B. erster Start)
-  if (!isDev && !fs.existsSync(versionFile)) {
+  // ✅ RELEASE: .version immer korrekt halten
+  if (!isDev) {
     fs.writeFileSync(versionFile, APP_VERSION, "utf8");
   }
 
   const defaults = getDefaultsDir();
 
-  // code
-  copySmart(path.join(defaults, "code", "server.js"),     path.join(ws, "server.js"));
-  copySmart(path.join(defaults, "code", "control.html"),  path.join(ws, "control.html"));
-  copySmart(path.join(defaults, "code", "overlay.html"),  path.join(ws, "overlay.html"));
-  copySmart(path.join(defaults, "code", "translations.json"), path.join(ws, "translations.json"));
+  // ✅ Code immer übernehmen (damit Updates wirklich ankommen)
+  copyForce(path.join(defaults, "code", "server.js"),         path.join(ws, "server.js"));
+  copyForce(path.join(defaults, "code", "control.html"),      path.join(ws, "control.html"));
+  copyForce(path.join(defaults, "code", "overlay.html"),      path.join(ws, "overlay.html"));
+  copyForce(path.join(defaults, "code", "translations.json"), path.join(ws, "translations.json"));
 
-
-  // presets
-  copySmart(path.join(defaults, "presets", "lt_presets.json"), path.join(ws, "lt_presets.json"));
-  copySmart(path.join(defaults, "presets", "ci_profiles.json"), path.join(ws, "ci_profiles.json"));
+  // ✅ Presets nur anlegen, wenn noch nicht vorhanden
+  copyIfMissing(path.join(defaults, "presets", "lt_presets.json"), path.join(ws, "lt_presets.json"));
+  copyIfMissing(path.join(defaults, "presets", "ci_profiles.json"), path.join(ws, "ci_profiles.json"));
 
   return ws;
 }
@@ -57,17 +66,6 @@ function prepareWorkspace() {
 function ensureDir(p) {
   if (!fs.existsSync(p)) fs.mkdirSync(p, { recursive: true });
 }
-
-function copySmart(src, dst) {
-  if (isDev) {
-    fs.copyFileSync(src, dst);
-    console.log("[DEV COPY]", path.basename(src), "->", dst);
-    return;
-  }
-  if (!fs.existsSync(dst)) fs.copyFileSync(src, dst);
-}
-
-
 
 function getDefaultsDir() {
   // Dev: v1.0.0/app  -> defaults liegt neben app
