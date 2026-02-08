@@ -1,12 +1,12 @@
 📺 OBS Overlay Tool
-A simple, web-based control panel to manage professional graphics for your live stream.
+A simple, web-based control panel to manage professional graphics for your live stream or broadcast.
 
 This tool allows you to control lower thirds, scoreboards, and timers in real-time. It’s designed for streamers who want professional overlays without the hassle of editing files manually during a broadcast.
 
-🔥 What it does for your Stream
+🔥 Features
 Live Lower Thirds: Easily show or hide name tags for your guests. Features two channels (Left & Right) and 8 slots to save your frequent guests for quick access.
 
-Pro Scoreboard: Keep your viewers updated with team names, scores, and club colors.
+Scoreboard: Keep your viewers updated with team names, scores, and club colors.
 
 Built-in Match Clock: Start, stop, and reset a match timer directly from the panel.
 
@@ -14,7 +14,7 @@ Dynamic Countdown/up: Perfect for breaks or "Starting Soon" scenes, featuring a 
 
 Quick Branding (CI): Save your primary and secondary colors and apply them to all elements with a single click.
 
-Bilingual: Switch the entire interface between English and German.
+[Work in Progress] Bilingual: Switch the entire interface between English and German.
 
 🚀 How to use it with OBS
 Launch the App: Open the OBS Overlay Tool on your computer.
@@ -41,9 +41,7 @@ Run it: npm start
 📂 Structure at a glance
 app/: The core Electron application.
 
-default/: Master templates for the server, control panel, and overlays.
-
-translations.json: Central file for all UI texts (EN/DE).
+defaults/: Master templates for the server, control panel, overlays and translations.
 
 📜 License
 MIT License - Use it, change it, and have fun with your streams!
