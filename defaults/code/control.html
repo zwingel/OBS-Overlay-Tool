@@ -1,0 +1,1260 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Control</title>
+<style>
+  html,body{
+  margin:0;
+  background:#0b0c10;
+  color:#fff;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+}
+
+.wrap{max-width:1100px;margin:0 auto;padding:16px;}
+
+.top{
+  display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:16px;
+  padding:12px 14px;
+}
+
+.pill{padding:6px 10px;border-radius:999px;font-weight:800;font-size:12px;}
+.ok{background:rgba(0,255,140,.18);border:1px solid rgba(0,255,140,.35);}
+.bad{background:rgba(255,80,80,.18);border:1px solid rgba(255,80,80,.35);}
+
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px;margin-top:14px;}
+.card{
+  grid-column:span 12;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:16px;
+  padding:14px;
+}
+@media(min-width:900px){.half{grid-column:span 6;}}
+
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+label{font-size:13px;opacity:.85}
+
+input[type="text"],input[type="number"],select{
+  background:rgba(0,0,0,.35);
+  border:1px solid rgba(255,255,255,.12);
+  color:#fff;
+  border-radius:12px;
+  padding:10px 12px;
+  outline:none;
+  min-width:220px;
+}
+select{min-width:220px}
+input[type="color"]{width:46px;height:40px;border:0;background:transparent;padding:0}
+
+button{
+  background:#fff;
+  color:#000;
+  border:0;
+  border-radius:14px;
+  padding:10px 12px;
+  font-weight:900;
+  cursor:pointer;
+  transition: transform .06s ease, filter .12s ease, box-shadow .12s ease, background .12s ease, color .12s ease, border-color .12s ease;
+}
+button:active{transform:scale(.98);}
+
+.muted{opacity:.7;font-size:12px}
+
+/* Active/Inactive = wirklich tauschen (global!) */
+button.is-on{
+  background:#fff !important;
+  color:#000 !important;
+  border:0 !important;
+  box-shadow:0 0 0 2px rgba(255,255,255,.18) inset, 0 8px 18px rgba(0,0,0,.30);
+}
+button.is-off{
+  background:rgba(255,255,255,.12) !important;
+  color:#fff !important;
+  border:1px solid rgba(255,255,255,.18) !important;
+  box-shadow:none !important;
+}
+
+/* Apply (bleibt für "Übernehmen/Save") */
+button.apply{
+  background:#4c6fff;
+  color:#fff;
+  border:0;
+  box-shadow:0 6px 16px rgba(76,111,255,.35);
+}
+/* Apply soll NICHT den on/off State wechseln */
+button.apply.is-on,button.apply.is-off{
+  background:#4c6fff !important;
+  color:#fff !important;
+  border:0 !important;
+}
+
+button.flash-ok{animation:flashGreen .45s ease;}
+@keyframes flashGreen{
+  0%{background:#2ecc71;box-shadow:0 0 0 0 rgba(46,204,113,.6);color:#000;}
+  60%{background:#2ecc71;box-shadow:0 0 0 6px rgba(46,204,113,0);color:#000;}
+  100%{background:inherit;color:inherit;}
+}
+
+/* Secondary (z.B. Hide / Delete) */
+button.secondary{
+  background:rgba(255,255,255,.12);
+  color:#fff;
+  border:1px solid rgba(255,255,255,.18);
+}
+
+/* Team Buttons */
+button.teamBtn{border:1px solid rgba(255,255,255,.22);}
+
+/* ===== Slots: alles in einer Reihe ===== */
+.slotRow{
+  display:grid;
+  grid-template-columns:
+    64px   /* Slot X */
+    1fr    /* Preset */
+    170px  /* Links/Rechts größer */
+    110px  /* Show kleiner */
+    110px; /* Hide kleiner */
+  gap:10px;
+  align-items:center;
+}
+
+/* Selects im Grid dürfen schrumpfen */
+.slotRow select{
+  width:100%;
+  min-width:0;
+}
+
+/* Slot Buttons kompakter, damit Hide in die Reihe passt */
+.slotRow button{
+  padding:8px 10px;
+  border-radius:12px;
+}
+
+/* Mobile: erst wirklich spät umbrechen */
+@media(max-width:600px){
+  .slotRow{ grid-template-columns: 64px 1fr; }
+}
+
+/* ===== ComboBox (Input + Dropdown) ===== */
+.combo{
+  position:relative;
+  display:flex;
+  align-items:stretch;
+  gap:0;
+}
+.combo input{
+  flex:1;
+  min-width:220px;
+  border-top-right-radius:0;
+  border-bottom-right-radius:0;
+}
+.combo .comboBtn{
+  width:44px;
+  min-width:44px;
+  border-top-left-radius:0;
+  border-bottom-left-radius:0;
+  background:rgba(255,255,255,.12);
+  color:#fff;
+  border:1px solid rgba(255,255,255,.18);
+}
+.combo .comboList{
+  position:absolute;
+  top:calc(100% + 6px);
+  left:0;
+  right:0;
+  z-index:50;
+  max-height:260px;
+  overflow:auto;
+  background:rgba(20,22,28,.98);
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:12px;
+  box-shadow:0 12px 30px rgba(0,0,0,.35);
+  padding:6px;
+}
+.combo .comboItem{
+  padding:10px 10px;
+  border-radius:10px;
+  cursor:pointer;
+  user-select:none;
+  font-weight:700;
+  font-size:13px;
+  opacity:.95;
+}
+.combo .comboItem:hover,
+.combo .comboItem.is-active{
+  background:rgba(255,255,255,.10);
+}
+.combo .comboEmpty{
+  padding:10px 10px;
+  border-radius:10px;
+  opacity:.65;
+  font-size:12px;
+}
+
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div style="font-size:18px;font-weight:950;">Control Panel</div>
+    <span id="conn" class="pill bad">Disconnected</span>
+    <a class="muted" href="/overlay.html" style="color:#9aa3ff;text-decoration:none;">Overlay öffnen</a>
+    <span class="muted">Wenn „Disconnected“: Server/Firewall/URL prüfen.</span>
+	<button id="btn_sync" class="secondary" onclick="syncFromServer(this)">
+	  Sync
+	</button>
+  </div>
+
+  <div class="grid">
+    <!-- Lower Thirds -->
+    <div class="card half">
+      <div style="font-weight:950;font-size:16px;margin-bottom:8px;">Lower Third – Links</div>
+      <div class="row" style="margin-bottom:10px">
+        <label>Preset</label>
+		<div class="combo" id="combo_ltL">
+		  <input id="ltL_presetName" type="text" placeholder="z.B. Partei A" autocomplete="off">
+		  <button type="button" class="comboBtn" aria-label="Presets öffnen">▾</button>
+		  <div class="comboList" hidden></div>
+		</div>
+        
+        <button class="secondary" onclick="ltPresetLoad('left', this)">Load → Picker</button>
+        <button class="apply" onclick="ltPresetSave('left', this)">Save</button>
+        <button class="secondary" onclick="ltPresetDelete(this)">Delete</button>
+      </div>
+
+      <div class="row">
+        <label>Name</label><input id="ltL_name" type="text">
+        <label>Subtitle</label><input id="ltL_sub" type="text">
+      </div>
+      <div class="row" style="margin-top:10px">
+        <label>Top</label><input id="ltL_top" type="color">
+        <label>Bottom</label><input id="ltL_bottom" type="color">
+        <label>Text</label><input id="ltL_text" type="color">
+        <label>Auto-Hide (s)</label><input id="ltL_auto" type="number" min="0" step="1" value="0" style="width:110px">
+      </div>
+      <div class="row" style="margin-top:10px">
+        <button class="apply" onclick="saveLt('left', this)">Übernehmen</button>
+        <button id="btn_ltL_show" onclick="act({type:'lt_show',side:'left'})">Einblenden</button>
+        <button id="btn_ltL_hide" class="secondary" onclick="act({type:'lt_hide',side:'left'})">Ausblenden</button>
+      </div>
+    </div>
+
+    <div class="card half">
+      <div style="font-weight:950;font-size:16px;margin-bottom:8px;">Lower Third – Rechts</div>
+
+      <div class="row" style="margin-bottom:10px">
+        <label>Preset</label>
+		<div class="combo" id="combo_ltR">
+		  <input id="ltR_presetName" type="text" placeholder="z.B. Partei A" autocomplete="off">
+		  <button type="button" class="comboBtn" aria-label="Presets öffnen">▾</button>
+		  <div class="comboList" hidden></div>
+		</div>
+        
+	<button class="secondary" onclick="ltPresetLoad('right', this)">Load → Picker</button>
+        <button class="apply" onclick="ltPresetSave('right', this)">Save</button>
+        <button class="secondary" onclick="ltPresetDelete(this)">Delete</button>
+      </div>
+
+      <div class="row">
+        <label>Name</label><input id="ltR_name" type="text">
+        <label>Subtitle</label><input id="ltR_sub" type="text">
+      </div>
+      <div class="row" style="margin-top:10px">
+        <label>Top</label><input id="ltR_top" type="color">
+        <label>Bottom</label><input id="ltR_bottom" type="color">
+        <label>Text</label><input id="ltR_text" type="color">
+        <label>Auto-Hide (s)</label><input id="ltR_auto" type="number" min="0" step="1" value="0" style="width:110px">
+      </div>
+      <div class="row" style="margin-top:10px">
+        <button class="apply" onclick="saveLt('right', this)">Übernehmen</button>
+        <button id="btn_ltR_show" onclick="act({type:'lt_show',side:'right'})">Einblenden</button>
+        <button id="btn_ltR_hide" class="secondary" onclick="act({type:'lt_hide',side:'right'})">Ausblenden</button>
+      </div>
+    </div>
+
+    <!-- Scoreboard -->
+    <div class="card">
+      <div style="font-weight:950;font-size:16px;margin-bottom:8px;">Scoreboard</div>
+      <div class="row">
+        <button id="btn_sb_on" onclick="act({type:'sb_show'})">Ein</button>
+        <button id="btn_sb_off" class="secondary" onclick="act({type:'sb_hide'})">Aus</button>
+        <button class="secondary" onclick="act({type:'sb_reset'})">Reset</button>
+	<button class="apply" onclick="saveSb(this)">Übernehmen</button>
+      </div>
+
+      <div class="row" style="margin-top:10px">
+        <label>Team 1</label><input id="sb1_name" type="text" value="Team 1">
+        <label>Farbe</label><input id="sb1_color" type="color">
+        <label>Text</label><input id="sb1_text" type="color">
+      </div>
+      <div class="row">
+        <button id="btn_t1_dec" class="teamBtn" onclick="act({type:'sb_dec',team:1})">Team 1 -</button>
+        <button id="btn_t1_inc" class="teamBtn" onclick="act({type:'sb_inc',team:1})">Team 1 +</button>
+        <label>Set</label><input id="sb1_set" type="number" min="0" step="1" value="0" style="width:110px">
+        <button class="secondary" onclick="setScore(1)">Setzen</button>
+      </div>
+
+      <div class="row" style="margin-top:10px">
+        <label>Team 2</label><input id="sb2_name" type="text" value="Team 2">
+        <label>Farbe</label><input id="sb2_color" type="color">
+        <label>Text</label><input id="sb2_text" type="color">
+      </div>
+      <div class="row">
+        <button id="btn_t2_dec" class="teamBtn" onclick="act({type:'sb_dec',team:2})">Team 2 -</button>
+        <button id="btn_t2_inc" class="teamBtn" onclick="act({type:'sb_inc',team:2})">Team 2 +</button>
+        <label>Set</label><input id="sb2_set" type="number" min="0" step="1" value="0" style="width:110px">
+        <button class="secondary" onclick="setScore(2)">Setzen</button>
+      </div>
+
+      <div class="row" style="margin-top:10px">
+        <button id="btn_clock_toggle" onclick="act({type:'clock_toggle'})">Uhr Toggle</button>
+        <button id="btn_clock_run" onclick="act({type:'clock_startstop'})">Start/Stop</button>
+        <label>Startzeit (mm:ss)</label>
+        <input id="clock_start" type="text" placeholder="45:00" style="width:120px">
+        <button onclick="setClock()">Setzen</button>
+        <button class="secondary" onclick="act({type:'clock_reset'})">Reset</button>
+      </div>
+    </div>
+
+    <!-- Timer -->
+    <div class="card">
+      <div style="font-weight:950;font-size:16px;margin-bottom:8px;">Timer</div>
+      <div class="row">
+        <button id="btn_timer_on" onclick="act({type:'timer_show'})">Ein</button>
+        <button id="btn_timer_off" class="secondary" onclick="act({type:'timer_hide'})">Aus</button>
+        <button id="btn_timer_run" onclick="act({type:'timer_startstop'})">Start/Stop</button>
+        <button class="secondary" onclick="act({type:'timer_reset'})">Reset</button>
+      </div>
+
+      <div class="row" style="margin-top:10px">
+        <button id="btn_mode_cd" class="secondary" onclick="act({type:'timer_mode',mode:'countdown'})">Countdown</button>
+        <button id="btn_mode_cu" class="secondary" onclick="act({type:'timer_mode',mode:'countup'})">Countup</button>
+        <label>Label</label><input id="t_label" type="text" placeholder="z.B. PAUSE">
+      </div>
+
+      <div class="row" style="margin-top:10px">
+        <label>Sekunden</label><input id="t_total" type="number" min="0" step="1" value="300" style="width:140px">
+        <button onclick="act({type:'timer_set',totalSeconds:Number(t_total.value||0)})">Setzen</button>
+        <label>Text</label><input id="t_text" type="color">
+        <label>Ring</label><input id="t_ring" type="color">
+		<button class="apply" onclick="patch({timer:{label:t_label.value,textColor:t_text.value,ringColor:t_ring.value}}); flash(this); clearDirty();">Übernehmen</button>
+      </div>
+	<div class="row" style="margin-top:10px">
+  <label>X</label>
+  <input id="t_pos_x" type="range" min="-1" max="1" step="0.01" value="0" data-default="0">
+  <span id="t_pos_x_val" class="muted">0.00</span>
+
+  <label>Y</label>
+  <input id="t_pos_y" type="range" min="-1" max="1" step="0.01" value="0" data-default="0">
+  <span id="t_pos_y_val" class="muted">0.00</span>
+</div>
+
+      <div class="row" style="margin-top:10px">
+        <label>BG optional</label><input id="t_bg" type="file" accept="image/*">
+        <button class="secondary" onclick="patch({timer:{backgroundDataUrl:''}})">BG entfernen</button>
+      </div>
+    </div>
+
+    <!-- Skalierung -->
+    <div class="card">
+      <div style="font-weight:950;font-size:16px;margin-bottom:8px;">Skalierung</div>
+
+      <div class="row">
+        <label>Lower Thirds</label>
+        <input id="s_lt" type="range" min="0.5" max="1.5" step="0.01" value="1.0" data-default="1.0">
+        <span id="s_lt_val" class="muted">1.00</span>
+      </div>
+
+      <div class="row">
+        <label>Scoreboard</label>
+        <input id="s_sb" type="range" min="0.5" max="1.5" step="0.01" value="1.0" data-default="1.0">
+        <span id="s_sb_val" class="muted">1.00</span>
+      </div>
+
+      <div class="row">
+        <label>Timer</label>
+        <input id="s_t" type="range" min="0.5" max="3" step="0.01" value="1.0" data-default="1.0">
+        <span id="s_t_val" class="muted">1.00</span>
+      </div>
+    </div>
+
+    <!-- CI Profile Card -->
+    <div class="card">
+      <div style="font-weight:950;font-size:16px;margin-bottom:8px;">CI Defaults (Lower Third Top/Bottom + Timer Ring)</div>
+
+      <div class="row lt-slot" style="margin-bottom:10px">
+        <label>Profilname</label>
+        <input id="ci_name" type="text" placeholder="z.B. Lokalzeitung">
+        <label>Vorhanden</label>
+        <select id="ci_select" class="lt-preset-select"></select>
+        <button class="secondary" onclick="ciLoadSelectedToPickers(this)">Load → Picker setzen</button>
+        <button class="apply" onclick="ciSave(this)">Save</button>
+        <button class="secondary" onclick="ciDelete(this)">Delete</button>
+      </div>
+
+      <div class="row">
+        <label>Primary (LT Top + Timer Ring)</label>
+        <input id="ci_primary" type="color">
+        <label>Secondary (LT Bottom)</label>
+        <input id="ci_secondary" type="color">
+      </div>
+
+      <div class="muted" style="margin-top:8px">
+        „Load → Picker“ setzt nur die Color-Picker (Voreinstellung). Erst mit „Übernehmen“ werden Farben live ans Overlay gesendet.
+      </div>
+    </div>
+
+    <!-- Lower Third Slots -->
+    <div class="card">
+      <div style="font-weight:950;font-size:16px;margin-bottom:8px;">Lower Third Slots (8 Presets)</div>
+
+     
+      <div id="slotList" style="display:flex;flex-direction:column;gap:10px;"></div>
+    </div>
+
+<div class="card">
+  <div style="font-weight:950;font-size:16px;margin-bottom:8px;">Reset</div>
+  <div class="row">
+    <button class="secondary" onclick="resetCode(this)">Code Reset (HTML/JS/Server)</button>
+    <button class="secondary" onclick="resetPresets(this)">Preset Reset (LT/CI)</button>
+    <span class="muted">Backups landen in <code>workspace/_backups</code></span>
+  </div>
+</div>
+
+    </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+
+  const socket = io({ transports:["websocket","polling"] });
+  const conn = document.getElementById("conn");
+
+  // Button refs (State)
+  const btn_ltL_show = document.getElementById("btn_ltL_show");
+  const btn_ltL_hide = document.getElementById("btn_ltL_hide");
+  const btn_ltR_show = document.getElementById("btn_ltR_show");
+  const btn_ltR_hide = document.getElementById("btn_ltR_hide");
+  const btn_sb_on = document.getElementById("btn_sb_on");
+  const btn_sb_off = document.getElementById("btn_sb_off");
+  const btn_clock_toggle = document.getElementById("btn_clock_toggle");
+  const btn_clock_run = document.getElementById("btn_clock_run");
+  const btn_timer_on = document.getElementById("btn_timer_on");
+  const btn_timer_off = document.getElementById("btn_timer_off");
+  const btn_timer_run = document.getElementById("btn_timer_run");
+  const btn_mode_cd = document.getElementById("btn_mode_cd");
+  const btn_mode_cu = document.getElementById("btn_mode_cu");
+
+  socket.on("connect", ()=> { conn.textContent="Connected"; conn.className="pill ok"; });
+  socket.on("disconnect", ()=> { conn.textContent="Disconnected"; conn.className="pill bad"; });
+
+  let currentState = null;
+
+  // ===== Dirty-State =====
+  let uiDirty = false;
+  let lastServerState = null;
+
+  function markDirty(){ uiDirty = true; }
+
+  function clearDirty(){
+    uiDirty = false;
+    // nach Übernehmen wieder synchronisieren (optional)
+    if(lastServerState) fillForm(lastServerState);
+  }
+
+  // setzt Feldwert nur, wenn nicht "locked" oder nicht dirty
+  function safeSet(id, value){
+    const el = document.getElementById(id);
+    if(!el) return;
+
+    // locked + dirty => nicht überschreiben
+    if(uiDirty && el.dataset.locked === "1") return;
+
+    // value setzen (für number/colour/text reicht .value)
+    el.value = value;
+  }
+
+  socket.on("state", (s)=> {
+    currentState = s;
+    lastServerState = s;
+
+    fillForm(s);
+
+    const newLeft  = s?.shownSlot?.left  ?? null;
+    const newRight = s?.shownSlot?.right ?? null;
+
+    if (newLeft !== lastShownSlot.left || newRight !== lastShownSlot.right) {
+      lastShownSlot.left = newLeft;
+      lastShownSlot.right = newRight;
+
+      if (ltCache) {
+        ltCache.shownSlot = { left: newLeft, right: newRight };
+        renderSlots(ltCache);
+      }
+    }
+  });
+  
+
+
+
+  function patch(p){ socket.emit("patch", p); }
+  function act(a){ socket.emit("action", a); }
+
+  function flash(btn){
+    if(!btn) return;
+    btn.classList.remove("flash-ok");
+    void btn.offsetWidth;
+    btn.classList.add("flash-ok");
+  }
+
+  function setBtnState(btn, on){
+    if(!btn) return;
+    btn.classList.remove("is-on","is-off");
+    btn.classList.add(on ? "is-on" : "is-off");
+  }
+
+  function styleTeamButtons(team, bg, fg){
+    const dec = document.getElementById(team===1 ? "btn_t1_dec" : "btn_t2_dec");
+    const inc = document.getElementById(team===1 ? "btn_t1_inc" : "btn_t2_inc");
+    [dec,inc].forEach(b=>{
+      if(!b) return;
+      b.style.background = bg;
+      b.style.color = fg;
+    });
+  }
+
+  function bindScale(id, labelId, key){
+    const el = document.getElementById(id);
+    const lab = document.getElementById(labelId);
+    const send = () => {
+      const v = Number(el.value);
+      lab.textContent = v.toFixed(2);
+      patch({ scale: { [key]: v } });
+    };
+    el.addEventListener("input", send);
+  }
+  bindScale("s_lt", "s_lt_val", "lowerThird");
+  bindScale("s_sb", "s_sb_val", "scoreboard");
+  bindScale("s_t",  "s_t_val",  "timer");
+
+  function fillForm(s){
+    // LT links
+    safeSet("ltL_name",   s.lowerThird.left.name || "");
+    safeSet("ltL_sub",    s.lowerThird.left.subtitle || "");
+    safeSet("ltL_top",    s.lowerThird.left.topColor || "#c23b3b");
+    safeSet("ltL_bottom", s.lowerThird.left.bottomColor || "#a9a9a9");
+    safeSet("ltL_text",   s.lowerThird.left.textColor || "#000000");
+    safeSet("ltL_auto",   s.lowerThird.left.autoHideSec || 0);
+
+    // LT rechts
+    safeSet("ltR_name",   s.lowerThird.right.name || "");
+    safeSet("ltR_sub",    s.lowerThird.right.subtitle || "");
+    safeSet("ltR_top",    s.lowerThird.right.topColor || "#c23b3b");
+    safeSet("ltR_bottom", s.lowerThird.right.bottomColor || "#a9a9a9");
+    safeSet("ltR_text",   s.lowerThird.right.textColor || "#000000");
+    safeSet("ltR_auto",   s.lowerThird.right.autoHideSec || 0);
+
+    // Scoreboard
+    safeSet("sb1_name",  s.scoreboard.team1.name || "Team 1");
+    safeSet("sb2_name",  s.scoreboard.team2.name || "Team 2");
+    safeSet("sb1_color", s.scoreboard.team1.color || "#d40000");
+    safeSet("sb2_color", s.scoreboard.team2.color || "#0a22d6");
+    safeSet("sb1_text",  s.scoreboard.team1.textColor || "#ffffff");
+    safeSet("sb2_text",  s.scoreboard.team2.textColor || "#ffffff");
+
+    // Timer
+    safeSet("t_label", s.timer.label || "");
+    safeSet("t_total", (s.timer.totalSeconds ?? 300));
+    safeSet("t_text",  s.timer.textColor || "#ffffff");
+    safeSet("t_ring",  s.timer.ringColor || "#ff0000");
+
+    // Scale (die dürfen immer live)
+    const sc = s.scale || {};
+    s_lt.value = sc.lowerThird ?? 1; s_lt_val.textContent = Number(s_lt.value).toFixed(2);
+    s_sb.value = sc.scoreboard ?? 1; s_sb_val.textContent = Number(s_sb.value).toFixed(2);
+    s_t.value  = sc.timer ?? 1;      s_t_val.textContent  = Number(s_t.value).toFixed(2);
+
+    // Button states (müssen immer live laufen)
+    setBtnState(btn_ltL_show, s.lowerThird.left.visible);
+    setBtnState(btn_ltL_hide, !s.lowerThird.left.visible);
+    setBtnState(btn_ltR_show, s.lowerThird.right.visible);
+    setBtnState(btn_ltR_hide, !s.lowerThird.right.visible);
+    setBtnState(btn_sb_on, s.scoreboard.visible);
+    setBtnState(btn_sb_off, !s.scoreboard.visible);
+    setBtnState(btn_clock_toggle, s.scoreboard.clock.enabled);
+    setBtnState(btn_clock_run, s.scoreboard.clock.running);
+    setBtnState(btn_timer_on, s.timer.visible);
+    setBtnState(btn_timer_off, !s.timer.visible);
+    setBtnState(btn_timer_run, s.timer.running);
+    setBtnState(btn_mode_cd, s.timer.mode === "countdown");
+    setBtnState(btn_mode_cu, s.timer.mode === "countup");
+
+    styleTeamButtons(1, s.scoreboard.team1.color || "#d40000", s.scoreboard.team1.textColor || "#fff");
+    styleTeamButtons(2, s.scoreboard.team2.color || "#0a22d6", s.scoreboard.team2.textColor || "#fff");
+
+    // Timer Position (darf immer live)
+    t_pos_x.value = s.timer.pos?.x ?? 0;
+    t_pos_y.value = s.timer.pos?.y ?? 0;
+    t_pos_x_val.textContent = Number(t_pos_x.value).toFixed(2);
+    t_pos_y_val.textContent = Number(t_pos_y.value).toFixed(2);
+  }
+  
+  
+  function bindDirtyTo(ids){
+    ids.forEach(id=>{
+      const el = document.getElementById(id);
+      if(!el) return;
+
+      // Feld soll im Dirty-Mode NICHT überschrieben werden:
+      el.dataset.locked = "1";
+
+      el.addEventListener("input", markDirty);
+      el.addEventListener("change", markDirty);
+    });
+  }
+
+  // NUR diese Felder sind "dirty-relevant" (werden nicht vom state überschrieben)
+  bindDirtyTo([
+    // Lower Third links
+    "ltL_name","ltL_sub","ltL_top","ltL_bottom","ltL_text","ltL_auto",
+    // Lower Third rechts
+    "ltR_name","ltR_sub","ltR_top","ltR_bottom","ltR_text","ltR_auto",
+    // Scoreboard
+    "sb1_name","sb1_color","sb1_text",
+    "sb2_name","sb2_color","sb2_text",
+    // Timer
+    "t_label","t_total","t_text","t_ring"
+    // clock_start NICHT locken, weil es nicht aus state gesetzt wird – kannst du aber ergänzen, wenn du willst
+  ]);
+  
+  
+
+  function saveLt(side, btn){
+    const isR = side==="right";
+    patch({ lowerThird: { [side]: {
+      name: (isR?ltR_name.value:ltL_name.value),
+      subtitle: (isR?ltR_sub.value:ltL_sub.value),
+      topColor: (isR?ltR_top.value:ltL_top.value),
+      bottomColor: (isR?ltR_bottom.value:ltL_bottom.value),
+      textColor: (isR?ltR_text.value:ltL_text.value),
+      autoHideSec: Number(isR?ltR_auto.value:ltL_auto.value)||0
+    }}});
+    flash(btn);
+    clearDirty();
+  }
+
+  function saveSb(btn){
+    // kompletten aktuellen SB-State behalten (wichtig: clock nicht verlieren)
+    const sb = structuredClone(currentState?.scoreboard || {});
+    sb.team1 = { ...(sb.team1||{}), name: sb1_name.value, color: sb1_color.value, textColor: sb1_text.value };
+    sb.team2 = { ...(sb.team2||{}), name: sb2_name.value, color: sb2_color.value, textColor: sb2_text.value };
+
+    patch({ scoreboard: sb });
+    flash(btn);
+    clearDirty();
+  }
+
+  function setScore(team){
+    const val = Math.max(0, Number(team===1 ? sb1_set.value : sb2_set.value) || 0);
+
+    const sb = structuredClone(currentState?.scoreboard || {});
+    if(team === 1){
+      sb.team1 = { ...(sb.team1||{}), score: val };
+    }else{
+      sb.team2 = { ...(sb.team2||{}), score: val };
+    }
+
+    patch({ scoreboard: sb });
+  }
+
+  function act(a){
+    // optional: kleiner Debug, damit du im Browser siehst dass es rausgeht
+    console.log("ACTION ->", a);
+    socket.emit("action", a);
+  }
+  
+
+  function setClock(){
+    const val = clock_start.value.trim();
+    const m = val.match(/^(\d+):([0-5]\d)$/);
+    if (!m) return alert("Format mm:ss (z.B. 45:00)");
+    const seconds = Number(m[1])*60 + Number(m[2]);
+    act({ type:"clock_set", seconds });
+  }
+
+  document.getElementById("t_bg").addEventListener("change", async (e)=>{
+    const f = e.target.files?.[0];
+    if(!f) return;
+
+    const url = await toDataURL(f);
+
+    // ✅ per REST (express limit gilt)
+    await apiPost("/api/patch", { timer: { backgroundDataUrl: url } });
+
+    // optional: Input wieder leeren (nur Anzeige)
+    e.target.value = "";
+  });
+  
+  function toDataURL(file){
+    return new Promise((res,rej)=>{
+      const r=new FileReader();
+      r.onload=()=>res(r.result);
+      r.onerror=rej;
+      r.readAsDataURL(file);
+    });
+  }
+
+function bindTimerPos(){
+  const sx = t_pos_x, sy = t_pos_y;
+  const lx = t_pos_x_val, ly = t_pos_y_val;
+
+  function send(){
+    const x = Number(sx.value);
+    const y = Number(sy.value);
+    lx.textContent = x.toFixed(2);
+    ly.textContent = y.toFixed(2);
+    patch({ timer:{ pos:{ x, y } } });
+  }
+
+  sx.addEventListener("input", send);
+  sy.addEventListener("input", send);
+}
+bindTimerPos();
+
+
+  /* =========================
+     API Helper
+  ========================= */
+  async function apiGet(url){
+    const r = await fetch(url);
+    if(!r.ok) throw new Error(await r.text());
+    return r.json();
+  }
+  async function apiPost(url, body){
+    const r = await fetch(url, { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(body||{}) });
+    if(!r.ok) throw new Error(await r.text());
+    return r.json();
+  }
+
+  // Init Combos (einmal!)
+  initComboBox("combo_ltL","ltL_presetName");
+  initComboBox("combo_ltR","ltR_presetName");
+
+
+  /* =========================
+     CI Profile UI
+  ========================= */
+  async function refreshCiList(){
+    const data = await apiGet("/api/ci");
+    const sel = ci_select;
+    sel.innerHTML = "";
+    const names = Object.keys(data.profiles||{}).sort((a,b)=>a.localeCompare(b));
+    const opt0 = document.createElement("option");
+    opt0.value = ""; opt0.textContent = "-- wählen --";
+    sel.appendChild(opt0);
+    names.forEach(n=>{
+      const o=document.createElement("option");
+      o.value=n; o.textContent=n;
+      sel.appendChild(o);
+    });
+
+    // last
+    if (data.last && names.includes(data.last)) sel.value = data.last;
+
+    // set pickers to last if exists
+    const cur = data.profiles?.[sel.value];
+    if (cur){
+      ci_name.value = sel.value;
+      ci_primary.value = cur.primary;
+      ci_secondary.value = cur.secondary;
+    } else {
+      ci_primary.value = ci_primary.value || "#c23b3b";
+      ci_secondary.value = ci_secondary.value || "#a9a9a9";
+    }
+  }
+
+  async function ciSave(btn){
+    try{
+      const name = (ci_name.value||"").trim();
+      if(!name) return alert("Bitte Profilname eingeben.");
+      await apiPost("/api/ci/save",{ name, primary: ci_primary.value, secondary: ci_secondary.value });
+      await refreshCiList();
+      flash(btn);
+    }catch(e){ alert("CI Save fehlgeschlagen:\n"+e.message); }
+  }
+
+  async function ciDelete(btn){
+    try{
+      const name = (ci_select.value||ci_name.value||"").trim();
+      if(!name) return alert("Bitte Profil auswählen.");
+      await apiPost("/api/ci/delete",{ name });
+      await refreshCiList();
+      flash(btn);
+    }catch(e){ alert("CI Delete fehlgeschlagen:\n"+e.message); }
+  }
+
+  async function ciLoadSelectedToPickers(btn){
+    try{
+      const data = await apiGet("/api/ci");
+      const name = (ci_select.value||"").trim();
+      if(!name) return alert("Bitte Profil auswählen.");
+      const p = data.profiles?.[name];
+      if(!p) return alert("Profil nicht gefunden.");
+      ci_name.value = name;
+      ci_primary.value = p.primary;
+      ci_secondary.value = p.secondary;
+
+      // in relevante Picker übernehmen (nur UI!)
+      ltL_top.value = p.primary;
+      ltR_top.value = p.primary;
+      ltL_bottom.value = p.secondary;
+      ltR_bottom.value = p.secondary;
+      t_ring.value = p.primary;
+
+      flash(btn);
+	  markDirty();
+    }catch(e){ alert("CI Load fehlgeschlagen:\n"+e.message); }
+  }
+
+  /* =========================
+     Lower Third Presets
+  ========================= */
+  async function ltPresetSave(side, btn){
+    try{
+      const presetName = (side==="right" ? ltR_presetName.value : ltL_presetName.value).trim();
+      if(!presetName) return alert("Preset-Name fehlt.");
+      const isR = side==="right";
+      const preset = {
+        name: (isR?ltR_name.value:ltL_name.value),
+        subtitle: (isR?ltR_sub.value:ltL_sub.value),
+        topColor: (isR?ltR_top.value:ltL_top.value),
+        bottomColor: (isR?ltR_bottom.value:ltL_bottom.value),
+        textColor: (isR?ltR_text.value:ltL_text.value),
+        autoHideSec: Number(isR?ltR_auto.value:ltL_auto.value)||0
+      };
+      await apiPost("/api/lt/save", { presetName, preset });
+      await refreshLtUi();
+      flash(btn);
+    }catch(e){ alert("LT Preset Save fehlgeschlagen:\n"+e.message); }
+  }
+
+  async function ltPresetLoad(side, btn){
+    try{
+      const presetName = (side==="right" ? ltR_presetName.value : ltL_presetName.value).trim();
+      if(!presetName) return alert("Preset-Name fehlt.");
+      const data = await apiGet("/api/lt");
+      const p = data.presets?.[presetName];
+      if(!p) return alert("Preset nicht gefunden.");
+
+      // Picker/UI setzen (nicht patchen!)
+      if(side==="right"){
+        ltR_name.value = p.name||"";
+        ltR_sub.value = p.subtitle||"";
+        ltR_top.value = p.topColor||"#c23b3b";
+        ltR_bottom.value = p.bottomColor||"#a9a9a9";
+        ltR_text.value = p.textColor||"#000000";
+        ltR_auto.value = p.autoHideSec||0;
+      }else{
+        ltL_name.value = p.name||"";
+        ltL_sub.value = p.subtitle||"";
+        ltL_top.value = p.topColor||"#c23b3b";
+        ltL_bottom.value = p.bottomColor||"#a9a9a9";
+        ltL_text.value = p.textColor||"#000000";
+        ltL_auto.value = p.autoHideSec||0;
+      }
+
+      flash(btn);
+	  markDirty();
+    }catch(e){ alert("LT Preset Load fehlgeschlagen:\n"+e.message); }
+  }
+
+  async function ltPresetDelete(btn){
+    try{
+      const name = (ltL_presetName.value||ltR_presetName.value||"").trim();
+      if(!name) return alert("Preset-Name fehlt.");
+      await apiPost("/api/lt/delete",{ presetName:name });
+      await refreshLtUi();
+      flash(btn);
+    }catch(e){ alert("LT Preset Delete fehlgeschlagen:\n"+e.message); }
+  }
+
+  /* =========================
+     Slots UI
+  ========================= */
+
+function renderSlots(data){
+  const box = document.getElementById("slotList");
+  box.innerHTML = "";
+
+  const presetNames = Object.keys(data.presets||{}).sort((a,b)=>a.localeCompare(b));
+
+  for(let i=1;i<=8;i++){
+    const cfg = data.slots?.[i-1] || { preset:"", side:"left" };
+
+    const row = document.createElement("div");
+    row.className = "slotRow";
+
+    const lbl = document.createElement("div");
+    lbl.textContent = "Slot " + i;
+    lbl.style.fontWeight = "900";
+
+    // Preset Select
+    const sel = document.createElement("select");
+    const opt0 = document.createElement("option");
+    opt0.value=""; opt0.textContent="-- Preset wählen --";
+    sel.appendChild(opt0);
+
+    presetNames.forEach(n=>{
+      const o=document.createElement("option");
+      o.value=n; o.textContent=n;
+      sel.appendChild(o);
+    });
+    sel.value = cfg.preset || "";
+
+    // Side Select
+    const sideSel = document.createElement("select");
+    ["left","right"].forEach(v=>{
+      const o=document.createElement("option");
+      o.value=v; o.textContent = (v==="left"?"Links":"Rechts");
+      sideSel.appendChild(o);
+    });
+    sideSel.value = (cfg.side==="right") ? "right" : "left";
+
+    // Show/Hide Buttons (wie Ein-/Ausblenden)
+    const showBtn = document.createElement("button");
+    showBtn.textContent = "Show";
+    showBtn.className = "";
+    // State setzen: show ist "on", wenn genau dieser Slot auf dieser Seite aktiv sichtbar ist
+  const isShown =
+       data.shownSlot?.left === i
+    || data.shownSlot?.right === i;
+
+  setBtnState(showBtn, isShown);
+    
+
+    showBtn.onclick = async ()=>{
+      const sideNow = sideSel.value;
+      await apiPost("/api/lt/slot", { slot:i, presetName: sel.value, side: sideNow }); // Mapping sicher speichern
+      act({ type:"lt_slot_show", slot:i}); // Side kommt aus UI
+      flash(showBtn);
+      await refreshLtUi();
+    };
+
+    const hideBtn = document.createElement("button");
+    hideBtn.textContent = "Hide";
+    hideBtn.className = "secondary";
+	setBtnState(hideBtn, isShown === false);
+    
+
+    hideBtn.onclick = async ()=>{
+      const sideNow = sideSel.value;
+      act({ type:"lt_slot_hide", slot:i});
+      await refreshLtUi();
+    };
+
+    // Mapping speichern, wenn Dropdown geändert wird
+    sel.onchange = async ()=>{
+      await apiPost("/api/lt/slot",{ slot:i, presetName: sel.value, side: sideSel.value });
+      await refreshLtUi();
+    };
+    sideSel.onchange = async ()=>{
+      await apiPost("/api/lt/slot",{ slot:i, presetName: sel.value, side: sideSel.value });
+      await refreshLtUi();
+    };
+
+    row.appendChild(lbl);
+    row.appendChild(sel);
+    row.appendChild(sideSel);
+    row.appendChild(showBtn);
+    row.appendChild(hideBtn);
+
+    box.appendChild(row);
+  }
+}
+
+
+/* =========================
+   Lower Third Presets + Slots UI
+========================= */
+let ltCache = null;
+let lastShownSlot = { left: null, right: null };
+
+
+function fillLtPresetDatalist(data){
+  const dl = document.getElementById("ltPresetList");
+  if(!dl) return;
+  dl.innerHTML = "";
+  const names = Object.keys(data.presets||{}).sort((a,b)=>a.localeCompare(b));
+  names.forEach(n=>{
+    const opt = document.createElement("option");
+    opt.value = n;
+    dl.appendChild(opt);
+  });
+}
+
+async function refreshLtUi(){
+  ltCache = await apiGet("/api/lt");
+  const names = Object.keys(ltCache.presets || {});
+  setLtPresetNames(names);         // <<< Combo füttern
+  renderSlots(ltCache);
+
+  lastShownSlot.left  = ltCache?.shownSlot?.left  ?? null;
+  lastShownSlot.right = ltCache?.shownSlot?.right ?? null;
+}
+
+
+
+// Init
+(async ()=>{
+  try{
+    await refreshCiList();
+    await refreshLtUi();
+  }catch(e){
+    console.warn(e);
+  }
+})();
+
+/* =========================
+   ComboBox Helper (Presets)
+========================= */
+
+let LT_PRESET_NAMES = [];
+
+function initComboBox(containerId, inputId){
+  const box = document.getElementById(containerId);
+  const input = document.getElementById(inputId);
+  if(!box || !input) return;
+
+  const btn  = box.querySelector(".comboBtn");
+  const list = box.querySelector(".comboList");
+
+  let open = false;
+  let activeIndex = -1;
+  let filtered = [];
+
+  function render(items){
+    list.innerHTML = "";
+
+    if(!items.length){
+      const empty = document.createElement("div");
+      empty.className = "comboEmpty";
+      empty.textContent = "Keine Treffer";
+      list.appendChild(empty);
+      return;
+    }
+
+    items.forEach((name, idx)=>{
+      const it = document.createElement("div");
+      it.className = "comboItem";
+      it.textContent = name;
+      it.onclick = () => {
+        input.value = name;
+        input.dispatchEvent(new Event("change", { bubbles:true }));
+        closeList();
+      };
+      list.appendChild(it);
+    });
+
+    activeIndex = Math.min(activeIndex, items.length-1);
+    setActive(activeIndex);
+  }
+
+  function setActive(idx){
+    const items = [...list.querySelectorAll(".comboItem")];
+    items.forEach((el,i)=> el.classList.toggle("is-active", i===idx));
+    if(idx >= 0 && items[idx]){
+      items[idx].scrollIntoView({ block:"nearest" });
+    }
+  }
+
+  function filterNow(){
+    const q = (input.value||"").toLowerCase().trim();
+    filtered = !q
+      ? [...LT_PRESET_NAMES]
+      : LT_PRESET_NAMES.filter(n => n.toLowerCase().includes(q));
+
+    render(filtered);
+  }
+
+  function openList(){
+    if(open) return;
+    open = true;
+    list.hidden = false;
+    filterNow();
+  }
+
+  function closeList(){
+    if(!open) return;
+    open = false;
+    list.hidden = true;
+    activeIndex = -1;
+  }
+
+  function toggle(){
+    if(open) closeList();
+    else {
+      input.focus();
+      openList();
+    }
+  }
+
+  // Button toggelt
+  btn.addEventListener("click", (e)=>{
+    e.preventDefault();
+    toggle();
+  });
+
+  // Tippen filtert live + öffnet
+  input.addEventListener("input", ()=>{
+    openList();
+    filterNow();
+  });
+
+  // Fokus öffnet (optional)
+  input.addEventListener("focus", ()=>{
+    openList();
+    filterNow();
+  });
+
+  // Keyboard navigation
+  input.addEventListener("keydown", (e)=>{
+    if(e.key === "ArrowDown"){
+      if(!open) openList();
+      else{
+        activeIndex = Math.min((activeIndex<0?0:activeIndex+1), filtered.length-1);
+        setActive(activeIndex);
+      }
+      e.preventDefault();
+    }
+    if(e.key === "ArrowUp"){
+      if(open){
+        activeIndex = Math.max(activeIndex-1, 0);
+        setActive(activeIndex);
+        e.preventDefault();
+      }
+    }
+    if(e.key === "Enter"){
+      if(open && activeIndex >= 0 && filtered[activeIndex]){
+        input.value = filtered[activeIndex];
+        input.dispatchEvent(new Event("change", { bubbles:true }));
+        closeList();
+        e.preventDefault();
+      }
+    }
+    if(e.key === "Escape"){
+      closeList();
+      e.preventDefault();
+    }
+  });
+
+  // Click outside schließt
+  document.addEventListener("mousedown", (e)=>{
+    if(!box.contains(e.target)) closeList();
+  });
+
+  // Expose updater
+  box._comboUpdate = () => {
+    if(open) filterNow();
+  };
+}
+
+function setLtPresetNames(names){
+  LT_PRESET_NAMES = (names||[]).slice().sort((a,b)=>a.localeCompare(b));
+  // wenn Boxen existieren, aktualisieren
+  const a = document.getElementById("combo_ltL");
+  const b = document.getElementById("combo_ltR");
+  if(a && a._comboUpdate) a._comboUpdate();
+  if(b && b._comboUpdate) b._comboUpdate();
+}
+
+
+
+// ===== Range Slider: Doppelklick = Reset auf Default =====
+document.addEventListener("dblclick", (e) => {
+  const el = e.target;
+  if (!(el instanceof HTMLInputElement)) return;
+  if (el.type !== "range") return;
+
+  const def = el.dataset.default;
+  if (def === undefined) return;
+
+  el.value = def;
+
+  // 🔥 input-Event feuern, damit bestehende Logik greift
+  el.dispatchEvent(new Event("input", { bubbles: true }));
+});
+
+async function resetCode(btn){
+  if(!confirm("Code Reset setzt server.js, control.html, overlay.html zurück.\nDeine Presets bleiben.\n\nFortfahren?")) return;
+  try{
+    const r = await apiPost("/api/reset/code", {});
+    flash(btn);
+
+    // ✅ klare Meldung
+    alert("Code Reset OK.\n\nWichtig: Bitte die App jetzt komplett schließen und neu starten,\nsonst läuft noch die alte Server-Version.");
+
+    // optional: UI reload (bringt aber ohne Neustart nicht die neue server.js)
+    location.reload();
+  }catch(e){
+    alert("Code Reset fehlgeschlagen:\n"+e.message);
+  }
+}
+
+async function resetPresets(btn){
+  if(!confirm("Preset Reset setzt lt_presets.json und ci_profiles.json zurück.\nDeine Slots/Presets gehen dabei verloren.\n\nFortfahren?")) return;
+  try{
+    await apiPost("/api/reset/presets", {});
+    flash(btn);
+    alert("Preset Reset OK.");
+    if (typeof refreshCiList === "function") refreshCiList();
+    if (typeof refreshLtUi === "function") refreshLtUi();
+  }catch(e){
+    alert("Preset Reset fehlgeschlagen:\n"+e.message);
+  }
+}
+
+
+function getActiveLtPresetName(){
+  // 1) Wenn gerade eins der beiden Inputs fokussiert ist → das nehmen
+  const a = document.activeElement;
+  if (a && (a.id === "ltL_presetName" || a.id === "ltR_presetName")) {
+    return (a.value || "").trim();
+  }
+
+  // 2) Sonst: wenn links gefüllt → links, sonst rechts
+  const l = (document.getElementById("ltL_presetName")?.value || "").trim();
+  const r = (document.getElementById("ltR_presetName")?.value || "").trim();
+  return l || r;
+}
+
+async function ltPresetDelete(btn){
+  try{
+    const name = getActiveLtPresetName();
+    if(!name) return alert("Preset-Name fehlt. Wähle eins aus der Liste oder tippe den Namen.");
+
+    if(!confirm(`Preset wirklich löschen?\n\n"${name}"`)) return;
+
+    await apiPost("/api/lt/delete", { presetName: name });
+    await refreshLtUi();
+
+    // Inputs leeren, falls genau dieser Name drin stand
+    const lEl = document.getElementById("ltL_presetName");
+    const rEl = document.getElementById("ltR_presetName");
+    if(lEl && lEl.value.trim() === name) lEl.value = "";
+    if(rEl && rEl.value.trim() === name) rEl.value = "";
+
+    flash(btn);
+  }catch(e){
+    alert("LT Preset Delete fehlgeschlagen:\n"+e.message);
+  }
+}
+
+ </script>
+</body>
+</html>

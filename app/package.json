@@ -1,0 +1,38 @@
+{
+  "name": "obs-overlay-tool",
+  "productName": "OBS Overlay Tool",
+  "version": "1.0.1",
+  "description": "OBS Overlay Controller",
+  "main": "main.js",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder"
+  },
+  "devDependencies": {
+    "electron": "^32.2.0",
+    "electron-builder": "^26.7.0"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "socket.io": "^4.7.5"
+  },
+  "build": {
+    "appId": "de.philipp.obs-overlay",
+    "mac": {
+      "category": "public.app-category.video",
+      "target": "dmg"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "files": [
+      "**/*"
+    ],
+    "extraResources": [
+      { "from": "../defaults", "to": "defaults" },
+      { "from": "../presets", "to": "presets" }
+    ]
+  }
+
+}

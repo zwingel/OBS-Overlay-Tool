@@ -1,0 +1,521 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=1920,height=1080,initial-scale=1" />
+<title>Overlay</title>
+<style>
+  html,body{
+    margin:0; width:1920px; height:1080px;
+    background:transparent; overflow:hidden;
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  }
+  #stage{ position:relative; width:1920px; height:1080px; }
+
+  /* optionaler Timer-Background */
+  #timerBg{ position:absolute; inset:0; background-size:cover; background-position:center; pointer-events:none; }
+
+/* Skalierung: Position bleibt stabil durch origin */
+#ltLeft  { transform-origin: left bottom; }
+#ltRight { transform-origin: right bottom; }
+#scoreboard { transform-origin: left top; }   /* falls du es links positionierst */
+#timer { transform-origin: center center; }
+
+
+/* ===== LOWER THIRDS – Text sitzt sauber in den Balken ===== */
+.lt{
+  position:absolute;
+  bottom:60px;
+  width:520px;
+  height:90px;
+  pointer-events:none;
+  opacity:0;
+  transition: none;
+  filter: drop-shadow(0 10px 18px rgba(0,0,0,.30));
+}
+.lt.is-visible{ opacity:1; }
+
+.lt.left{ left:60px; }
+.lt.right{ right:60px; }
+
+/* Balken */
+.lt .bar{
+  position:absolute;
+  height:28px;
+  will-change:transform;
+}
+
+/* Fade-out am Ende (Mask) */
+.lt.left .bar{
+  left:0;
+  transform: translateX(-115%);
+  -webkit-mask-image: linear-gradient(to right, #000 0 82%, transparent 100%);
+  mask-image: linear-gradient(to right, #000 0 82%, transparent 100%);
+}
+.lt.right .bar{
+  right:0;
+  transform: translateX(115%);
+  -webkit-mask-image: linear-gradient(to left, #000 0 82%, transparent 100%);
+  mask-image: linear-gradient(to left, #000 0 82%, transparent 100%);
+}
+
+.lt .bar.top{ top:10px; width:420px; }
+.lt .bar.bottom{ top:42px; width:360px; height:22px; }
+
+/* IN Animation: 20% langsamer */
+.lt.is-visible.left .bar.top{
+  animation: ltInL .42s cubic-bezier(.2,.9,.2,1) forwards;
+}
+.lt.is-visible.left .bar.bottom{
+  animation: ltInL .42s cubic-bezier(.2,.9,.2,1) forwards;
+  animation-delay:.17s;
+}
+
+.lt.is-visible.right .bar.top{
+  animation: ltInR .42s cubic-bezier(.2,.9,.2,1) forwards;
+}
+.lt.is-visible.right .bar.bottom{
+  animation: ltInR .42s cubic-bezier(.2,.9,.2,1) forwards;
+  animation-delay:.17s;
+}
+
+@keyframes ltInL{ to{ transform:translateX(0);} }
+@keyframes ltInR{ to{ transform:translateX(0);} }
+
+/* Bars nur "fest" auf 0 halten, wenn Einblend-Animation fertig ist */
+.lt.is-ready.left  .bar{ transform: translateX(0); }
+.lt.is-ready.right .bar{ transform: translateX(0); }
+
+/* Beim Ausblenden ebenfalls von 0 starten */
+.lt.is-hiding.left  .bar{ transform: translateX(0); }
+.lt.is-hiding.right .bar{ transform: translateX(0); }
+
+/* Textcontainer exakt über den Balken */
+.lt .ltText{
+  position:absolute;
+  display:flex;
+  align-items:center;
+  pointer-events:none;
+  opacity:0;
+  transform: translateY(2px);
+  transition: opacity .20s ease, transform .20s ease;
+  transition-delay:.18s;
+}
+.lt.is-visible .ltText{ opacity:1; transform: translateY(0); }
+
+.lt .ltText.topLine{ top:10px; height:28px; width:420px; padding:0 14px; }
+.lt .ltText.bottomLine{ top:42px; height:22px; width:360px; padding:0 14px; }
+
+.lt.left .ltText{ left:0; justify-content:flex-start; text-align:left; }
+.lt.right .ltText{ right:0; justify-content:flex-end; text-align:right; }
+
+.lt .txt{
+  width:100%;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+}
+.lt .txt.name{ font-size:16px; font-weight:900; line-height:1; }
+.lt .txt.sub { font-size:12px; font-weight:700; line-height:1; opacity:.95; }
+
+/* ===== AUSBLENDEN (wie Einblenden, nur rückwärts) ===== */
+
+/* während Hide sichtbar bleiben (kein Fade) */
+.lt.is-hiding{ opacity:1; }
+
+/* Text zuerst aus – sofort, ohne Delay */
+.lt.is-hiding .ltText{
+  opacity:0;
+  transform: translateY(2px);
+  transition: opacity .20s ease, transform .20s ease;
+  transition-delay:0s;
+}
+
+/* OUT-Keyframes: NUR "to" -> startet vom aktuellen transform (0 wenn sichtbar) */
+@keyframes ltOutL { from{transform:translateX(0);} to{transform:translateX(-115%);} }
+@keyframes ltOutR { from{transform:translateX(0);} to{transform:translateX(115%);} }
+
+/* Balken raus: erst nach Text-Out, dann bottom, dann top */
+.lt.left.is-hiding .bar.bottom{
+  animation: ltOutL .42s cubic-bezier(.4,0,.8,.2) forwards;
+  animation-delay:.20s;
+}
+.lt.left.is-hiding .bar.top{
+  animation: ltOutL .42s cubic-bezier(.4,0,.8,.2) forwards;
+  animation-delay:.37s; /* .20 + .17 */
+}
+
+.lt.right.is-hiding .bar.bottom{
+  animation: ltOutR .42s cubic-bezier(.4,0,.8,.2) forwards;
+  animation-delay:.20s;
+}
+.lt.right.is-hiding .bar.top{
+  animation: ltOutR .42s cubic-bezier(.4,0,.8,.2) forwards;
+  animation-delay:.37s;
+}
+
+
+  /* ===== SCOREBOARD (wie Vorlage: Teamfarben vollflächig + weiße Mittelboxen) ===== */
+#scoreboard{
+  position:absolute;
+  top:26px;
+  left:60px;                 /* <- wie Mockup eher links */
+  display:flex;
+  align-items:stretch;
+  gap:0;
+
+  opacity:0;
+  transition: opacity .18s ease;
+  pointer-events:none;
+  filter: drop-shadow(0 12px 20px rgba(0,0,0,.35));
+}
+#scoreboard.visible{ opacity:1; }
+
+#scoreboard > div{
+  height:46px;
+  border:1px solid rgba(0,0,0,.55); /* dünner Rand wie Mockup */
+}
+
+/* Team-Blöcke vollflächig in Farbe */
+.sbTeam{
+  width:300px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  color:#fff;
+  font-weight:900;
+  letter-spacing:.2px;
+}
+.sbTeamName{
+  font-size:22px;
+  font-weight:900;
+  line-height:1;           /* 🔥 kein Extra-Abstand */
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.sbTeam1{ background:#d40000; }
+.sbTeam2{ background:#0a22d6; }
+
+/* Mittelbox für Score (weiß) */
+.sbScoreMid{
+  width:130px;
+  background:#ffffff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.sbScoreText{
+  color:#111;
+  font-size:22px;
+  font-weight:950;
+}
+
+/* Uhrbox (weiß) */
+.sbClockMid{
+  width:86px;
+  background:#ffffff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.sbClockText{
+  color:#111;
+  font-size:20px;
+  font-weight:950;
+}
+
+/* Uhr optional: komplett ausblenden */
+.sbClockMid.disabled{ display:none; }
+
+  /* ===== TIMER (wie Vorlage: Kreis + Zeit im Kreis) ===== */
+  #timer{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  opacity:0;
+  transition: opacity .18s ease;
+  pointer-events:none;
+}  #timer.visible{ opacity:1; }
+
+  #timerCircle{
+    position:relative;
+    width:180px;
+    height:180px;
+  }
+  #ringSvg{ width:180px; height:180px; display:block; }
+  #timeVal{
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:36px;
+    font-weight:950;
+    letter-spacing:.5px;
+  }
+  #timerLabel{
+    position:absolute;
+    left:50%;
+    top:calc(100% + 10px);
+    transform:translateX(-50%);
+    font-size:22px;
+    font-weight:900;
+    white-space:nowrap;
+  }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="timerBg"></div>
+
+  <div id="ltLeft" class="lt left">
+  <div class="bar top"></div>
+  <div class="bar bottom"></div>
+
+  <div class="ltText topLine">
+    <div class="txt name" id="ltLeftName"></div>
+  </div>
+  <div class="ltText bottomLine">
+    <div class="txt sub" id="ltLeftSub"></div>
+  </div>
+</div>
+
+<div id="ltRight" class="lt right">
+  <div class="bar top"></div>
+  <div class="bar bottom"></div>
+
+  <div class="ltText topLine">
+    <div class="txt name" id="ltRightName"></div>
+  </div>
+  <div class="ltText bottomLine">
+    <div class="txt sub" id="ltRightSub"></div>
+  </div>
+</div>
+  <div id="scoreboard">
+  <div class="sbTeam sbTeam1">
+    <div class="sbTeamName" id="sb1Name">Team 1</div>
+  </div>
+
+  <div class="sbScoreMid">
+    <div class="sbScoreText"><span id="sb1Score">0</span> &nbsp;:&nbsp; <span id="sb2Score">0</span></div>
+  </div>
+
+  <div class="sbTeam sbTeam2">
+    <div class="sbTeamName" id="sb2Name">Team 2</div>
+  </div>
+
+  <div class="sbClockMid" id="sbClockBox">
+    <div class="sbClockText" id="sbClock">00:00</div>
+  </div>
+</div>
+
+  <div id="timer">
+  <div id="timerCircle">
+    <svg id="ringSvg" viewBox="0 0 120 120">
+      <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(0,0,0,0)" stroke-width="8"/>
+      <circle id="ringProg" cx="60" cy="60" r="50" fill="none" stroke="#ff0000" stroke-width="6"
+              stroke-linecap="round" transform="rotate(-90 60 60)"/>
+    </svg>
+    <div id="timeVal">05:00</div>
+    <div id="timerLabel"></div>
+  </div>
+</div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const socket = io({ transports:["websocket","polling"] });
+
+  socket.on("connect", () => console.log("socket connected", socket.id));
+  socket.on("connect_error", (e) => console.error("socket connect_error", e));
+  socket.on("disconnect", (r) => {
+    console.warn("socket disconnected", r);
+    // Alles ausblenden, damit OBS nicht "stehen bleibt"
+    renderLt("left",  { visible:false, name:"", subtitle:"" });
+    renderLt("right", { visible:false, name:"", subtitle:"" });
+
+    // scoreboard/timer/etc. ebenfalls hart aus:
+    const sb = document.getElementById("scoreboard");
+    if (sb) sb.classList.remove("visible");
+
+    const timer = document.getElementById("timer");
+    if (timer) timer.classList.remove("visible");
+  });
+  
+
+  socket.on("state", (s) => render(s));
+
+  function render(s){
+    renderLt("left", s.lowerThird.left);
+    renderLt("right", s.lowerThird.right);
+	scoreboard.classList.toggle("visible", !!s.scoreboard.visible);
+	
+
+const sc = s.scale || {};
+
+// Basisfaktoren
+const BASE_LT = 1.4;   // deine Wunschgröße
+const BASE_SB = 1.0;
+const BASE_T  = 1.0;
+
+// Lower Thirds (links + rechts gleich!)
+const ltScale = (sc.lowerThird ?? 1) * BASE_LT;
+document.getElementById("ltLeft").style.transform  = `scale(${ltScale})`;
+document.getElementById("ltRight").style.transform = `scale(${ltScale})`;
+
+// Scoreboard
+document.getElementById("scoreboard").style.transform =
+  `scale(${(sc.scoreboard ?? 1) * BASE_SB})`;
+
+// Timer (nur Kreis)
+timerCircle.style.transform = `scale(${(sc.timer ?? 1) * BASE_T})`;
+timerCircle.style.transformOrigin = "center center";
+
+// Reflow, damit rect stimmt
+timerCircle.getBoundingClientRect();
+
+// ===== Timer Position (normiert -1..+1) auf echte Bühne mappen =====
+const px = Math.max(-1, Math.min(1, s.timer.pos?.x ?? 0));
+const py = Math.max(-1, Math.min(1, s.timer.pos?.y ?? 0));
+
+const stageRect = stage.getBoundingClientRect();
+const W = stageRect.width;
+const H = stageRect.height;
+
+// echte Größe vom Circle (inkl. Scale)
+const rect = timerCircle.getBoundingClientRect();
+const padX = rect.width / 2;
+const padY = rect.height / 2;
+
+// Zielkoordinate innerhalb der "safe area"
+const x = ((px + 1) / 2) * (W - 2 * padX) + padX;
+const y = ((py + 1) / 2) * (H - 2 * padY) + padY;
+
+// #timer ist per Flex exakt mittig -> wir verschieben relativ zur Mitte
+timer.style.transform = `translate(${x - W / 2}px, ${y - H / 2}px)`;
+
+
+
+document.querySelector(".sbTeam1").style.background = s.scoreboard.team1.color || "#d40000";
+document.querySelector(".sbTeam2").style.background = s.scoreboard.team2.color || "#0a22d6";
+
+sb1Name.textContent = s.scoreboard.team1.name || "";
+sb2Name.textContent = s.scoreboard.team2.name || "";
+sb1Score.textContent = s.scoreboard.team1.score ?? 0;
+sb2Score.textContent = s.scoreboard.team2.score ?? 0;
+
+const clockEnabled = !!s.scoreboard.clock.enabled;
+sbClockBox.classList.toggle("disabled", !clockEnabled);
+sbClock.textContent = fmt(s.scoreboard.clock.seconds || 0);
+// Textfarben setzen
+document.querySelector(".sbTeam1").style.color =
+  s.scoreboard.team1.textColor || "#ffffff";
+
+document.querySelector(".sbTeam2").style.color =
+  s.scoreboard.team2.textColor || "#ffffff";
+
+document.querySelector(".sbScoreText").style.color =
+  s.scoreboard.scoreTextColor || "#111111"; // optional, siehe unten
+
+sbClock.style.color =
+  s.scoreboard.clock.textColor || "#111111";
+
+
+    // Timer
+    timerBg.style.backgroundImage = s.timer.backgroundDataUrl ? `url('${s.timer.backgroundDataUrl}')` : "none";
+
+    timer.classList.toggle("visible", !!s.timer.visible);
+    timeVal.style.color = s.timer.textColor || "#fff";
+    timerLabel.style.color = s.timer.textColor || "#fff";
+    timerLabel.textContent = s.timer.label || "";
+    timeVal.textContent = fmt(s.timer.seconds || 0);
+
+    const r = 50;
+    const C = 2 * Math.PI * r;
+    ringProg.setAttribute("stroke", s.timer.ringColor || "#ff0000");
+    ringProg.setAttribute("stroke-dasharray", `${C} ${C}`);
+
+    let pct = 1;
+    if (s.timer.mode === "countdown") {
+      const total = Math.max(1, s.timer.totalSeconds || 1);
+      pct = (s.timer.seconds || 0) / total;
+    } else {
+      const total = Math.max(1, s.timer.totalSeconds || 60);
+      pct = Math.min(1, (s.timer.seconds || 0) / total);
+    }
+    ringProg.setAttribute("stroke-dashoffset", String(C - (C * pct)));
+  }
+
+  function renderLt(side, st){
+  const el = document.getElementById(side === "right" ? "ltRight" : "ltLeft");
+
+  // Farben immer aktualisieren
+  const bars = el.querySelectorAll(".bar");
+  bars[0].style.background = st.topColor || "#c23b3b";
+  bars[1].style.background = st.bottomColor || "#a9a9a9";
+
+  el.querySelectorAll(".ltText").forEach(t => {
+    t.style.color = st.textColor || "#000";
+  });
+
+  // Text immer aktualisieren
+  (side === "right" ? ltRightName : ltLeftName).textContent = st.name || "";
+  (side === "right" ? ltRightSub  : ltLeftSub ).textContent = st.subtitle || "";
+
+  // ---------- Flanken-Logik ----------
+  const nowVisible = !!st.visible;
+  const wasVisible = !!el._wasVisible;   // merkt sich den alten Zustand
+  el._wasVisible = nowVisible;
+
+  if (!el._hideTimer) el._hideTimer = null;
+
+  // keine Zustandsänderung? -> KEINE Animation neu starten
+  if (nowVisible === wasVisible) return;
+
+  // --------- Übergang false -> true (einblenden) ---------
+  if (nowVisible && !wasVisible) {
+    if (el._hideTimer) { clearTimeout(el._hideTimer); el._hideTimer = null; }
+
+    el.classList.remove("is-hiding");
+
+    // Animationen nur hier resetten
+    el.querySelectorAll(".bar").forEach(b => {
+      b.style.animation = "none";
+      b.offsetHeight; // reflow
+      b.style.animation = "";
+    });
+
+    el.classList.add("is-visible");
+    return;
+  }
+
+  // --------- Übergang true -> false (ausblenden) ---------
+  if (!nowVisible && wasVisible) {
+    // nur starten, wenn sichtbar und nicht schon hiding
+    if (el.classList.contains("is-visible") && !el.classList.contains("is-hiding")) {
+      el.classList.add("is-hiding");
+
+      const OUT_TOTAL_MS = 850;
+      el._hideTimer = setTimeout(() => {
+        el.classList.remove("is-visible");
+        el.classList.remove("is-hiding");
+        el._hideTimer = null;
+      }, OUT_TOTAL_MS);
+    }
+  }
+}
+
+  function fmt(sec){
+    sec = Math.max(0, Math.floor(sec));
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return String(m).padStart(2,"0") + ":" + String(s).padStart(2,"0");
+  }
+</script>
+</body>
+</html>
