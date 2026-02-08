@@ -1,7 +1,7 @@
 {
   "name": "obs-overlay-tool",
   "productName": "OBS Overlay Tool",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "OBS Overlay Controller",
   "main": "main.js",
   "private": true,
