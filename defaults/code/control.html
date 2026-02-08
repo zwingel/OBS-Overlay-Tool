@@ -202,183 +202,194 @@ button.teamBtn{border:1px solid rgba(255,255,255,.22);}
 <body>
 <div class="wrap">
   <div class="top">
-    <div style="font-size:18px;font-weight:950;">Control Panel</div>
+    <div style="font-size:18px;font-weight:950;" data-i18n="title">Control Panel</div>
     <span id="conn" class="pill bad">Disconnected</span>
-    <a class="muted" href="/overlay.html" style="color:#9aa3ff;text-decoration:none;">Overlay öffnen</a>
-    <span class="muted">Wenn „Disconnected“: Server/Firewall/URL prüfen.</span>
-	<button id="btn_sync" class="secondary" onclick="syncFromServer(this)">
-	  Sync
-	</button>
+    <a class="muted" href="/overlay.html" style="color:#9aa3ff;text-decoration:none;" data-i18n="open_overlay">Overlay öffnen</a>
+    <span class="muted" data-i18n="hint_disconnected">Wenn „Disconnected“: Server/Firewall/URL prüfen.</span>
+    <button id="btn_sync" class="secondary" onclick="syncFromServer(this)" data-i18n="sync">Sync</button>
+
+    <select id="lang" style="min-width:120px">
+      <option value="de">DE</option>
+      <option value="en">EN</option>
+    </select>
   </div>
 
   <div class="grid">
     <!-- Lower Thirds -->
     <div class="card half">
-      <div style="font-weight:950;font-size:16px;margin-bottom:8px;">Lower Third – Links</div>
+      <div style="font-weight:950;font-size:16px;margin-bottom:8px;" data-i18n="lt_left">Lower Third – Links</div>
+
       <div class="row" style="margin-bottom:10px">
-        <label>Preset</label>
-		<div class="combo" id="combo_ltL">
-		  <input id="ltL_presetName" type="text" placeholder="z.B. Partei A" autocomplete="off">
-		  <button type="button" class="comboBtn" aria-label="Presets öffnen">▾</button>
-		  <div class="comboList" hidden></div>
-		</div>
-        
-        <button class="secondary" onclick="ltPresetLoad('left', this)">Load → Picker</button>
-        <button class="apply" onclick="ltPresetSave('left', this)">Save</button>
-        <button class="secondary" onclick="ltPresetDelete(this)">Delete</button>
+        <label data-i18n="preset">Preset</label>
+        <div class="combo" id="combo_ltL">
+          <input id="ltL_presetName" type="text" placeholder="z.B. Partei A" data-i18n-placeholder="ph_preset_example" autocomplete="off">
+          <button type="button" class="comboBtn" aria-label="Presets öffnen">▾</button>
+          <div class="comboList" hidden></div>
+        </div>
+
+        <button class="secondary" onclick="ltPresetLoad('left', this)" data-i18n="btn_load">Load → Picker</button>
+        <button class="apply" onclick="ltPresetSave('left', this)" data-i18n="btn_save">Save</button>
+        <button class="secondary" onclick="ltPresetDelete(this)" data-i18n="btn_delete">Delete</button>
       </div>
 
       <div class="row">
-        <label>Name</label><input id="ltL_name" type="text">
-        <label>Subtitle</label><input id="ltL_sub" type="text">
+        <label data-i18n="name">Name</label><input id="ltL_name" type="text">
+        <label data-i18n="subtitle">Subtitle</label><input id="ltL_sub" type="text">
       </div>
+
       <div class="row" style="margin-top:10px">
-        <label>Top</label><input id="ltL_top" type="color">
-        <label>Bottom</label><input id="ltL_bottom" type="color">
-        <label>Text</label><input id="ltL_text" type="color">
-        <label>Auto-Hide (s)</label><input id="ltL_auto" type="number" min="0" step="1" value="0" style="width:110px">
+        <label data-i18n="top">Top</label><input id="ltL_top" type="color">
+        <label data-i18n="bottom">Bottom</label><input id="ltL_bottom" type="color">
+        <label data-i18n="text">Text</label><input id="ltL_text" type="color">
+        <label data-i18n="auto_hide">Auto-Hide (s)</label><input id="ltL_auto" type="number" min="0" step="1" value="0" style="width:110px">
       </div>
+
       <div class="row" style="margin-top:10px">
-        <button class="apply" onclick="saveLt('left', this)">Übernehmen</button>
-        <button id="btn_ltL_show" onclick="act({type:'lt_show',side:'left'})">Einblenden</button>
-        <button id="btn_ltL_hide" class="secondary" onclick="act({type:'lt_hide',side:'left'})">Ausblenden</button>
+        <button class="apply" onclick="saveLt('left', this)" data-i18n="btn_apply">Übernehmen</button>
+        <button id="btn_ltL_show" onclick="act({type:'lt_show',side:'left'})" data-i18n="btn_show">Einblenden</button>
+        <button id="btn_ltL_hide" class="secondary" onclick="act({type:'lt_hide',side:'left'})" data-i18n="btn_hide">Ausblenden</button>
       </div>
     </div>
 
     <div class="card half">
-      <div style="font-weight:950;font-size:16px;margin-bottom:8px;">Lower Third – Rechts</div>
+      <div style="font-weight:950;font-size:16px;margin-bottom:8px;" data-i18n="lt_right">Lower Third – Rechts</div>
 
       <div class="row" style="margin-bottom:10px">
-        <label>Preset</label>
-		<div class="combo" id="combo_ltR">
-		  <input id="ltR_presetName" type="text" placeholder="z.B. Partei A" autocomplete="off">
-		  <button type="button" class="comboBtn" aria-label="Presets öffnen">▾</button>
-		  <div class="comboList" hidden></div>
-		</div>
-        
-	<button class="secondary" onclick="ltPresetLoad('right', this)">Load → Picker</button>
-        <button class="apply" onclick="ltPresetSave('right', this)">Save</button>
-        <button class="secondary" onclick="ltPresetDelete(this)">Delete</button>
+        <label data-i18n="preset">Preset</label>
+        <div class="combo" id="combo_ltR">
+          <input id="ltR_presetName" type="text" placeholder="z.B. Partei A" data-i18n-placeholder="ph_preset_example" autocomplete="off">
+          <button type="button" class="comboBtn" aria-label="Presets öffnen">▾</button>
+          <div class="comboList" hidden></div>
+        </div>
+
+        <button class="secondary" onclick="ltPresetLoad('right', this)" data-i18n="btn_load">Load → Picker</button>
+        <button class="apply" onclick="ltPresetSave('right', this)" data-i18n="btn_save">Save</button>
+        <button class="secondary" onclick="ltPresetDelete(this)" data-i18n="btn_delete">Delete</button>
       </div>
 
       <div class="row">
-        <label>Name</label><input id="ltR_name" type="text">
-        <label>Subtitle</label><input id="ltR_sub" type="text">
+        <label data-i18n="name">Name</label><input id="ltR_name" type="text">
+        <label data-i18n="subtitle">Subtitle</label><input id="ltR_sub" type="text">
       </div>
+
       <div class="row" style="margin-top:10px">
-        <label>Top</label><input id="ltR_top" type="color">
-        <label>Bottom</label><input id="ltR_bottom" type="color">
-        <label>Text</label><input id="ltR_text" type="color">
-        <label>Auto-Hide (s)</label><input id="ltR_auto" type="number" min="0" step="1" value="0" style="width:110px">
+        <label data-i18n="top">Top</label><input id="ltR_top" type="color">
+        <label data-i18n="bottom">Bottom</label><input id="ltR_bottom" type="color">
+        <label data-i18n="text">Text</label><input id="ltR_text" type="color">
+        <label data-i18n="auto_hide">Auto-Hide (s)</label><input id="ltR_auto" type="number" min="0" step="1" value="0" style="width:110px">
       </div>
+
       <div class="row" style="margin-top:10px">
-        <button class="apply" onclick="saveLt('right', this)">Übernehmen</button>
-        <button id="btn_ltR_show" onclick="act({type:'lt_show',side:'right'})">Einblenden</button>
-        <button id="btn_ltR_hide" class="secondary" onclick="act({type:'lt_hide',side:'right'})">Ausblenden</button>
+        <button class="apply" onclick="saveLt('right', this)" data-i18n="btn_apply">Übernehmen</button>
+        <button id="btn_ltR_show" onclick="act({type:'lt_show',side:'right'})" data-i18n="btn_show">Einblenden</button>
+        <button id="btn_ltR_hide" class="secondary" onclick="act({type:'lt_hide',side:'right'})" data-i18n="btn_hide">Ausblenden</button>
       </div>
     </div>
 
     <!-- Scoreboard -->
     <div class="card">
-      <div style="font-weight:950;font-size:16px;margin-bottom:8px;">Scoreboard</div>
+      <div style="font-weight:950;font-size:16px;margin-bottom:8px;" data-i18n="scoreboard">Scoreboard</div>
       <div class="row">
-        <button id="btn_sb_on" onclick="act({type:'sb_show'})">Ein</button>
-        <button id="btn_sb_off" class="secondary" onclick="act({type:'sb_hide'})">Aus</button>
-        <button class="secondary" onclick="act({type:'sb_reset'})">Reset</button>
-	<button class="apply" onclick="saveSb(this)">Übernehmen</button>
+        <button id="btn_sb_on" onclick="act({type:'sb_show'})" data-i18n="on">Ein</button>
+        <button id="btn_sb_off" class="secondary" onclick="act({type:'sb_hide'})" data-i18n="off">Aus</button>
+        <button class="secondary" onclick="act({type:'sb_reset'})" data-i18n="reset">Reset</button>
+        <button class="apply" onclick="saveSb(this)" data-i18n="btn_apply">Übernehmen</button>
       </div>
 
       <div class="row" style="margin-top:10px">
-        <label>Team 1</label><input id="sb1_name" type="text" value="Team 1">
-        <label>Farbe</label><input id="sb1_color" type="color">
-        <label>Text</label><input id="sb1_text" type="color">
+        <label data-i18n="team1">Team 1</label><input id="sb1_name" type="text" value="Team 1">
+        <label data-i18n="color">Farbe</label><input id="sb1_color" type="color">
+        <label data-i18n="text">Text</label><input id="sb1_text" type="color">
       </div>
+
       <div class="row">
         <button id="btn_t1_dec" class="teamBtn" onclick="act({type:'sb_dec',team:1})">Team 1 -</button>
         <button id="btn_t1_inc" class="teamBtn" onclick="act({type:'sb_inc',team:1})">Team 1 +</button>
-        <label>Set</label><input id="sb1_set" type="number" min="0" step="1" value="0" style="width:110px">
-        <button class="secondary" onclick="setScore(1)">Setzen</button>
+        <label data-i18n="set">Setzen</label><input id="sb1_set" type="number" min="0" step="1" value="0" style="width:110px">
+        <button class="secondary" onclick="setScore(1)" data-i18n="btn_set">Setzen</button>
       </div>
 
       <div class="row" style="margin-top:10px">
-        <label>Team 2</label><input id="sb2_name" type="text" value="Team 2">
-        <label>Farbe</label><input id="sb2_color" type="color">
-        <label>Text</label><input id="sb2_text" type="color">
+        <label data-i18n="team2">Team 2</label><input id="sb2_name" type="text" value="Team 2">
+        <label data-i18n="color">Farbe</label><input id="sb2_color" type="color">
+        <label data-i18n="text">Text</label><input id="sb2_text" type="color">
       </div>
+
       <div class="row">
         <button id="btn_t2_dec" class="teamBtn" onclick="act({type:'sb_dec',team:2})">Team 2 -</button>
         <button id="btn_t2_inc" class="teamBtn" onclick="act({type:'sb_inc',team:2})">Team 2 +</button>
-        <label>Set</label><input id="sb2_set" type="number" min="0" step="1" value="0" style="width:110px">
-        <button class="secondary" onclick="setScore(2)">Setzen</button>
+        <label data-i18n="set">Setzen</label><input id="sb2_set" type="number" min="0" step="1" value="0" style="width:110px">
+        <button class="secondary" onclick="setScore(2)" data-i18n="btn_set">Setzen</button>
       </div>
 
       <div class="row" style="margin-top:10px">
-        <button id="btn_clock_toggle" onclick="act({type:'clock_toggle'})">Uhr Toggle</button>
-        <button id="btn_clock_run" onclick="act({type:'clock_startstop'})">Start/Stop</button>
-        <label>Startzeit (mm:ss)</label>
-        <input id="clock_start" type="text" placeholder="45:00" style="width:120px">
-        <button onclick="setClock()">Setzen</button>
-        <button class="secondary" onclick="act({type:'clock_reset'})">Reset</button>
+        <button id="btn_clock_toggle" onclick="act({type:'clock_toggle'})" data-i18n="clock_toggle">Uhr An/Aus</button>
+        <button id="btn_clock_run" onclick="act({type:'clock_startstop'})" data-i18n="start_stop">Start/Stop</button>
+        <label data-i18n="start_time">Startzeit (mm:ss)</label>
+        <input id="clock_start" type="text" placeholder="45:00" data-i18n-placeholder="ph_clock_example" style="width:120px">
+        <button onclick="setClock()" data-i18n="btn_set">Setzen</button>
+        <button class="secondary" onclick="act({type:'clock_reset'})" data-i18n="reset">Reset</button>
       </div>
     </div>
 
     <!-- Timer -->
     <div class="card">
-      <div style="font-weight:950;font-size:16px;margin-bottom:8px;">Timer</div>
+      <div style="font-weight:950;font-size:16px;margin-bottom:8px;" data-i18n="timer">Timer</div>
       <div class="row">
-        <button id="btn_timer_on" onclick="act({type:'timer_show'})">Ein</button>
-        <button id="btn_timer_off" class="secondary" onclick="act({type:'timer_hide'})">Aus</button>
-        <button id="btn_timer_run" onclick="act({type:'timer_startstop'})">Start/Stop</button>
-        <button class="secondary" onclick="act({type:'timer_reset'})">Reset</button>
+        <button id="btn_timer_on" onclick="act({type:'timer_show'})" data-i18n="on">Ein</button>
+        <button id="btn_timer_off" class="secondary" onclick="act({type:'timer_hide'})" data-i18n="off">Aus</button>
+        <button id="btn_timer_run" onclick="act({type:'timer_startstop'})" data-i18n="start_stop">Start/Stop</button>
+        <button class="secondary" onclick="act({type:'timer_reset'})" data-i18n="reset">Reset</button>
       </div>
 
       <div class="row" style="margin-top:10px">
-        <button id="btn_mode_cd" class="secondary" onclick="act({type:'timer_mode',mode:'countdown'})">Countdown</button>
-        <button id="btn_mode_cu" class="secondary" onclick="act({type:'timer_mode',mode:'countup'})">Countup</button>
-        <label>Label</label><input id="t_label" type="text" placeholder="z.B. PAUSE">
+        <button id="btn_mode_cd" class="secondary" onclick="act({type:'timer_mode',mode:'countdown'})" data-i18n="countdown">Countdown</button>
+        <button id="btn_mode_cu" class="secondary" onclick="act({type:'timer_mode',mode:'countup'})" data-i18n="countup">Countup</button>
+        <label data-i18n="label">Label</label><input id="t_label" type="text" placeholder="z.B. PAUSE" data-i18n-placeholder="ph_label_example">
       </div>
 
       <div class="row" style="margin-top:10px">
-        <label>Sekunden</label><input id="t_total" type="number" min="0" step="1" value="300" style="width:140px">
-        <button onclick="act({type:'timer_set',totalSeconds:Number(t_total.value||0)})">Setzen</button>
-        <label>Text</label><input id="t_text" type="color">
-        <label>Ring</label><input id="t_ring" type="color">
-		<button class="apply" onclick="patch({timer:{label:t_label.value,textColor:t_text.value,ringColor:t_ring.value}}); flash(this); clearDirty();">Übernehmen</button>
+        <label data-i18n="seconds">Sekunden</label><input id="t_total" type="number" min="0" step="1" value="300" style="width:140px">
+        <button onclick="act({type:'timer_set',totalSeconds:Number(t_total.value||0)})" data-i18n="btn_set">Setzen</button>
+        <label data-i18n="text">Text</label><input id="t_text" type="color">
+        <label data-i18n="ring">Ring</label><input id="t_ring" type="color">
+        <button class="apply" onclick="patch({timer:{label:t_label.value,textColor:t_text.value,ringColor:t_ring.value}}); flash(this); clearDirty();" data-i18n="btn_apply">Übernehmen</button>
       </div>
-	<div class="row" style="margin-top:10px">
-  <label>X</label>
-  <input id="t_pos_x" type="range" min="-1" max="1" step="0.01" value="0" data-default="0">
-  <span id="t_pos_x_val" class="muted">0.00</span>
-
-  <label>Y</label>
-  <input id="t_pos_y" type="range" min="-1" max="1" step="0.01" value="0" data-default="0">
-  <span id="t_pos_y_val" class="muted">0.00</span>
-</div>
 
       <div class="row" style="margin-top:10px">
-        <label>BG optional</label><input id="t_bg" type="file" accept="image/*">
-        <button class="secondary" onclick="patch({timer:{backgroundDataUrl:''}})">BG entfernen</button>
+        <label>X</label>
+        <input id="t_pos_x" type="range" min="-1" max="1" step="0.01" value="0" data-default="0">
+        <span id="t_pos_x_val" class="muted">0.00</span>
+
+        <label>Y</label>
+        <input id="t_pos_y" type="range" min="-1" max="1" step="0.01" value="0" data-default="0">
+        <span id="t_pos_y_val" class="muted">0.00</span>
+      </div>
+
+      <div class="row" style="margin-top:10px">
+        <label data-i18n="bg_optional">BG optional</label><input id="t_bg" type="file" accept="image/*">
+        <button class="secondary" onclick="patch({timer:{backgroundDataUrl:''}})" data-i18n="bg_remove">BG entfernen</button>
       </div>
     </div>
 
     <!-- Skalierung -->
     <div class="card">
-      <div style="font-weight:950;font-size:16px;margin-bottom:8px;">Skalierung</div>
+      <div style="font-weight:950;font-size:16px;margin-bottom:8px;" data-i18n="scaling">Skalierung</div>
 
       <div class="row">
-        <label>Lower Thirds</label>
+        <label data-i18n="lower_thirds">Lower Thirds</label>
         <input id="s_lt" type="range" min="0.5" max="1.5" step="0.01" value="1.0" data-default="1.0">
         <span id="s_lt_val" class="muted">1.00</span>
       </div>
 
       <div class="row">
-        <label>Scoreboard</label>
+        <label data-i18n="scoreboard">Scoreboard</label>
         <input id="s_sb" type="range" min="0.5" max="1.5" step="0.01" value="1.0" data-default="1.0">
         <span id="s_sb_val" class="muted">1.00</span>
       </div>
 
       <div class="row">
-        <label>Timer</label>
+        <label data-i18n="timer">Timer</label>
         <input id="s_t" type="range" min="0.5" max="3" step="0.01" value="1.0" data-default="1.0">
         <span id="s_t_val" class="muted">1.00</span>
       </div>
@@ -386,52 +397,58 @@ button.teamBtn{border:1px solid rgba(255,255,255,.22);}
 
     <!-- CI Profile Card -->
     <div class="card">
-      <div style="font-weight:950;font-size:16px;margin-bottom:8px;">CI Defaults (Lower Third Top/Bottom + Timer Ring)</div>
+      <div style="font-weight:950;font-size:16px;margin-bottom:8px;" data-i18n="ci_defaults">
+        CI Defaults (Lower Third Top/Bottom + Timer Ring)
+      </div>
 
       <div class="row lt-slot" style="margin-bottom:10px">
-        <label>Profilname</label>
-        <input id="ci_name" type="text" placeholder="z.B. Lokalzeitung">
-        <label>Vorhanden</label>
+        <label data-i18n="profile_name">Profilname</label>
+        <input id="ci_name" type="text" placeholder="z.B. Lokalzeitung" data-i18n-placeholder="ph_profile_example">
+        <label data-i18n="existing_profiles">Vorhanden</label>
         <select id="ci_select" class="lt-preset-select"></select>
-        <button class="secondary" onclick="ciLoadSelectedToPickers(this)">Load → Picker setzen</button>
-        <button class="apply" onclick="ciSave(this)">Save</button>
-        <button class="secondary" onclick="ciDelete(this)">Delete</button>
+
+        <button class="secondary" onclick="ciLoadSelectedToPickers(this)" data-i18n="btn_load">Load</button>
+        <button class="apply" onclick="ciSave(this)" data-i18n="btn_save">Save</button>
+        <button class="secondary" onclick="ciDelete(this)" data-i18n="btn_delete">Delete</button>
       </div>
 
       <div class="row">
-        <label>Primary (LT Top + Timer Ring)</label>
+        <label data-i18n="primary_color">Primary (LT Top + Timer Ring)</label>
         <input id="ci_primary" type="color">
-        <label>Secondary (LT Bottom)</label>
+        <label data-i18n="secondary_color">Secondary (LT Bottom)</label>
         <input id="ci_secondary" type="color">
       </div>
 
-      <div class="muted" style="margin-top:8px">
+      <div class="muted" style="margin-top:8px" data-i18n="ci_note">
         „Load → Picker“ setzt nur die Color-Picker (Voreinstellung). Erst mit „Übernehmen“ werden Farben live ans Overlay gesendet.
       </div>
     </div>
 
     <!-- Lower Third Slots -->
     <div class="card">
-      <div style="font-weight:950;font-size:16px;margin-bottom:8px;">Lower Third Slots (8 Presets)</div>
-
-     
+      <div style="font-weight:950;font-size:16px;margin-bottom:8px;" data-i18n="lower_third_slots">Lower Third Slots (8 Presets)</div>
       <div id="slotList" style="display:flex;flex-direction:column;gap:10px;"></div>
     </div>
 
-<div class="card">
-  <div style="font-weight:950;font-size:16px;margin-bottom:8px;">Reset</div>
-  <div class="row">
-    <button class="secondary" onclick="resetCode(this)">Code Reset (HTML/JS/Server)</button>
-    <button class="secondary" onclick="resetPresets(this)">Preset Reset (LT/CI)</button>
-    <span class="muted">Backups landen in <code>workspace/_backups</code></span>
+    <!-- Reset -->
+    <div class="card">
+      <div style="font-weight:950;font-size:16px;margin-bottom:8px;" data-i18n="reset_section">Reset</div>
+      <div class="row">
+        <button class="secondary" onclick="resetCode(this)" data-i18n="code_reset">Code Reset (HTML/JS/Server)</button>
+        <button class="secondary" onclick="resetPresets(this)" data-i18n="preset_reset">Preset Reset (LT/CI)</button>
+        <span class="muted" data-i18n="backup_note">Backups landen in <code>workspace/_backups</code></span>
+      </div>
+    </div>
+
   </div>
 </div>
+</body>
 
-    </div>
-</div>
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
+
+  console.log("CONTROL BUILD:", "2026-02-08-TEST-42");
 
   const socket = io({ transports:["websocket","polling"] });
   const conn = document.getElementById("conn");
@@ -451,8 +468,9 @@ button.teamBtn{border:1px solid rgba(255,255,255,.22);}
   const btn_mode_cd = document.getElementById("btn_mode_cd");
   const btn_mode_cu = document.getElementById("btn_mode_cu");
 
-  socket.on("connect", ()=> { conn.textContent="Connected"; conn.className="pill ok"; });
-  socket.on("disconnect", ()=> { conn.textContent="Disconnected"; conn.className="pill bad"; });
+  socket.on("connect", ()=> setConnStatus(true));
+  socket.on("disconnect", ()=> setConnStatus(false));
+
 
   let currentState = null;
 
@@ -887,6 +905,23 @@ bindTimerPos();
   /* =========================
      Slots UI
   ========================= */
+function setConnStatus(isConnected){
+  if(!conn) return;
+
+  conn.className = "pill " + (isConnected ? "ok" : "bad");
+  conn.textContent = t(isConnected ? "status_connected" : "status_disconnected");
+}
+
+function t(key){
+  if(!I18N) return key;
+
+  const fbCode = I18N.meta?.fallback || "en";
+  const dict = I18N[currentLang] || {};
+  const fb = I18N[fbCode] || {};
+
+  return (dict[key] ?? fb[key] ?? key);
+}
+
 
 function renderSlots(data){
   const box = document.getElementById("slotList");
@@ -901,13 +936,14 @@ function renderSlots(data){
     row.className = "slotRow";
 
     const lbl = document.createElement("div");
-    lbl.textContent = "Slot " + i;
+    lbl.textContent = t("slot") + " " + i;
     lbl.style.fontWeight = "900";
 
     // Preset Select
     const sel = document.createElement("select");
     const opt0 = document.createElement("option");
-    opt0.value=""; opt0.textContent="-- Preset wählen --";
+    opt0.value = "";
+    opt0.textContent = t("choose_preset");
     sel.appendChild(opt0);
 
     presetNames.forEach(n=>{
@@ -921,14 +957,14 @@ function renderSlots(data){
     const sideSel = document.createElement("select");
     ["left","right"].forEach(v=>{
       const o=document.createElement("option");
-      o.value=v; o.textContent = (v==="left"?"Links":"Rechts");
+      o.value=v; o.textContent = (v==="left" ? t("side_left") : t("side_right"));
       sideSel.appendChild(o);
     });
     sideSel.value = (cfg.side==="right") ? "right" : "left";
 
     // Show/Hide Buttons (wie Ein-/Ausblenden)
     const showBtn = document.createElement("button");
-    showBtn.textContent = "Show";
+    showBtn.textContent = t("show");
     showBtn.className = "";
     // State setzen: show ist "on", wenn genau dieser Slot auf dieser Seite aktiv sichtbar ist
   const isShown =
@@ -947,7 +983,7 @@ function renderSlots(data){
     };
 
     const hideBtn = document.createElement("button");
-    hideBtn.textContent = "Hide";
+    hideBtn.textContent = t("hide");
     hideBtn.className = "secondary";
 	setBtnState(hideBtn, isShown === false);
     
@@ -1009,17 +1045,6 @@ async function refreshLtUi(){
 }
 
 
-
-// Init
-(async ()=>{
-  try{
-    await refreshCiList();
-    await refreshLtUi();
-  }catch(e){
-    console.warn(e);
-  }
-})();
-
 /* =========================
    ComboBox Helper (Presets)
 ========================= */
@@ -1044,7 +1069,7 @@ function initComboBox(containerId, inputId){
     if(!items.length){
       const empty = document.createElement("div");
       empty.className = "comboEmpty";
-      empty.textContent = "Keine Treffer";
+      empty.textContent = t("no_results");
       list.appendChild(empty);
       return;
     }
@@ -1254,6 +1279,96 @@ async function ltPresetDelete(btn){
     alert("LT Preset Delete fehlgeschlagen:\n"+e.message);
   }
 }
+
+function syncFromServer(btn){
+  if(btn) btn.disabled = true;
+
+  socket.emit("action", { type: "sync" });
+
+  flash(btn);
+
+  setTimeout(()=>{
+    if(btn) btn.disabled = false;
+  }, 300);
+}
+
+// =========================
+// i18n (translations.json)
+// =========================
+let I18N = null;
+let currentLang = "de";
+
+async function loadI18n(){
+  if (I18N) return I18N;
+  const r = await fetch("/translations.json?v=" + Date.now(), { cache: "no-store" });
+  if(!r.ok) throw new Error("translations.json nicht gefunden: " + r.status);
+  I18N = await r.json();
+  return I18N;
+}
+
+function applyI18n(lang){
+  if(!I18N) return;
+  currentLang = (lang === "en") ? "en" : "de";
+
+  const dict = I18N[currentLang] || {};
+  document.documentElement.lang = currentLang;
+
+  // alle Elemente mit data-i18n austauschen
+  document.querySelectorAll("[data-i18n]").forEach(el=>{
+    const key = el.getAttribute("data-i18n");
+    const val = dict[key];
+    if(val == null) return; // Key fehlt -> Text bleibt wie er ist
+
+    // erlaubt auch HTML in translations (z.B. <code>...</code>)
+    el.innerHTML = String(val);
+  });
+
+  // optional: placeholders (wenn du welche brauchst)
+  document.querySelectorAll("[data-i18n-placeholder]").forEach(el=>{
+    const key = el.getAttribute("data-i18n-placeholder");
+    const val = dict[key];
+    if(val == null) return;
+    el.setAttribute("placeholder", String(val));
+  });
+}
+
+async function initI18n(){
+  try{
+    await loadI18n();
+
+    // gespeicherte Sprache oder Browser-Default
+    const saved = localStorage.getItem("lang");
+    const auto = (navigator.language || "").toLowerCase().startsWith("de") ? "de" : "en";
+    const initial = saved || auto;
+
+    const sel = document.getElementById("lang");
+    if(sel){
+      sel.value = initial;
+      sel.addEventListener("change", ()=>{
+        localStorage.setItem("lang", sel.value);
+        applyI18n(sel.value);
+        setConnStatus(socket.connected);
+        if (ltCache) renderSlots(ltCache);
+      });
+    }
+
+    applyI18n(initial);
+    setConnStatus(socket.connected);
+  }catch(e){
+    console.warn("i18n init failed:", e);
+  }
+}
+
+async function initApp(){
+  await initI18n();     // lädt translations + setzt currentLang + wendet auf data-i18n an
+  await refreshCiList();
+  await refreshLtUi();  // renderSlots() läuft jetzt NACH i18n
+}
+
+initApp();
+
+
+
 
  </script>
 </body>

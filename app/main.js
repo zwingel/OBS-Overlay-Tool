@@ -3,45 +3,54 @@ const path = require("path");
 const fs = require("fs");
 const { spawn } = require("child_process");
 const APP_VERSION = app.getVersion();
+const isDev = !app.isPackaged;
 let mainWindow = null;
 let isQuitting = false;
 let serverProc = null;
+
+console.log("Dev mode:", isDev);
 
 function prepareWorkspace() {
   const ws = getWorkspaceDir();
   ensureDir(ws);
 
-  // Workspace-Version prüfen (automatisch „frisch“ machen bei Update)
   const versionFile = path.join(ws, ".version");
   let workspaceVersion = "";
   if (fs.existsSync(versionFile)) {
     workspaceVersion = String(fs.readFileSync(versionFile, "utf8") || "").trim();
   }
 
-  if (workspaceVersion !== APP_VERSION) {
+  // RELEASE: Workspace nur bei Versionswechsel komplett neu
+  if (!isDev && workspaceVersion !== APP_VERSION) {
     console.log("Workspace update needed:", workspaceVersion, "→", APP_VERSION);
 
-    // Workspace neu erstellen
     fs.rmSync(ws, { recursive: true, force: true });
     fs.mkdirSync(ws, { recursive: true });
 
-    // Version schreiben
+    fs.writeFileSync(versionFile, APP_VERSION, "utf8");
+  }
+
+  // RELEASE: falls .version fehlt (z.B. erster Start)
+  if (!isDev && !fs.existsSync(versionFile)) {
     fs.writeFileSync(versionFile, APP_VERSION, "utf8");
   }
 
   const defaults = getDefaultsDir();
 
   // code
-  copyIfMissing(path.join(defaults, "code", "server.js"),   path.join(ws, "server.js"));
-  copyIfMissing(path.join(defaults, "code", "control.html"), path.join(ws, "control.html"));
-  copyIfMissing(path.join(defaults, "code", "overlay.html"), path.join(ws, "overlay.html"));
+  copySmart(path.join(defaults, "code", "server.js"),     path.join(ws, "server.js"));
+  copySmart(path.join(defaults, "code", "control.html"),  path.join(ws, "control.html"));
+  copySmart(path.join(defaults, "code", "overlay.html"),  path.join(ws, "overlay.html"));
+  copySmart(path.join(defaults, "code", "translations.json"), path.join(ws, "translations.json"));
+
 
   // presets
-  copyIfMissing(path.join(defaults, "presets", "lt_presets.json"), path.join(ws, "lt_presets.json"));
-  copyIfMissing(path.join(defaults, "presets", "ci_profiles.json"), path.join(ws, "ci_profiles.json"));
+  copySmart(path.join(defaults, "presets", "lt_presets.json"), path.join(ws, "lt_presets.json"));
+  copySmart(path.join(defaults, "presets", "ci_profiles.json"), path.join(ws, "ci_profiles.json"));
 
   return ws;
 }
+
 
 
 
@@ -49,9 +58,16 @@ function ensureDir(p) {
   if (!fs.existsSync(p)) fs.mkdirSync(p, { recursive: true });
 }
 
-function copyIfMissing(src, dst) {
+function copySmart(src, dst) {
+  if (isDev) {
+    fs.copyFileSync(src, dst);
+    console.log("[DEV COPY]", path.basename(src), "->", dst);
+    return;
+  }
   if (!fs.existsSync(dst)) fs.copyFileSync(src, dst);
 }
+
+
 
 function getDefaultsDir() {
   // Dev: v1.0.0/app  -> defaults liegt neben app

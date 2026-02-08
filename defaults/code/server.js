@@ -8,6 +8,9 @@ const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: "*" } });
 const DEFAULTS_DIR = process.env.DEFAULTS_DIR;
 
+console.log("SERVER BUILD:", "2026-02-08-STATE-ENDPOINT");
+
+
 function needDefaults() {
   if (!DEFAULTS_DIR) throw new Error("DEFAULTS_DIR fehlt (wird von der App nicht gesetzt).");
   return DEFAULTS_DIR;
@@ -19,8 +22,6 @@ function copyFile(src, dst) {
   if (!fs.existsSync(src)) throw new Error("Default fehlt: " + src);
   fs.copyFileSync(src, dst);
 }
-
-
 
 app.use(express.json({ limit: "25mb" }));
 app.use(express.static(__dirname));
@@ -323,6 +324,10 @@ let state = {
 shownSlot: { left: null, right: null },
 };
 
+app.get("/api/state", (req, res) => {
+  res.json(state);
+});
+
 function deepMerge(target, src) {
   if (typeof src !== "object" || src === null) return target;
   const out = Array.isArray(target) ? [...target] : { ...target };
@@ -399,6 +404,11 @@ function stopTimer() {
 
 function handleAction(a) {
   const t = a?.type;
+
+  if (a?.type === "sync") {
+  broadcast();
+  return;
+}
 
   // ===== LowerThird manuell =====
   if (t === "lt_show" || t === "lt_hide") {
@@ -613,9 +623,19 @@ function gracefulShutdown() {
   setTimeout(() => process.exit(0), 150);
 }
 
+/* ==================
+   Translations
+================= */
+
+app.get("/api/i18n", (req, res) => {
+  res.sendFile(path.join(__dirname, "translations.json"));
+});
+
+
 process.on("SIGTERM", gracefulShutdown);
 process.on("SIGINT", gracefulShutdown);
 
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`http://localhost:${PORT}  (overlay.html / control.html)`));
+server.listen(PORT, () => console.log(`Overlay: http://localhost:${PORT}/overlay.html / Panel: http://localhost:${PORT}/control.html)`));
+console.log("SERVER BUILD (before listen):", "2026-02-08-0332");
