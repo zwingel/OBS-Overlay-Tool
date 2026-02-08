@@ -2,55 +2,101 @@ const { app, BrowserWindow } = require("electron");
 const path = require("path");
 const fs = require("fs");
 const { spawn } = require("child_process");
+
 const APP_VERSION = app.getVersion();
+const isDev = !app.isPackaged;
+
 let mainWindow = null;
 let isQuitting = false;
 let serverProc = null;
 
+console.log("Dev mode:", isDev);
+
+function copyForce(src, dst) {
+  ensureDir(path.dirname(dst));
+  fs.copyFileSync(src, dst);
+}
+
+function copyIfMissing(src, dst) {
+  ensureDir(path.dirname(dst));
+  if (!fs.existsSync(dst)) fs.copyFileSync(src, dst);
+}
+
 function prepareWorkspace() {
   const ws = getWorkspaceDir();
-  ensureDir(ws);
 
-  // Workspace-Version prüfen (automatisch „frisch“ machen bei Update)
   const versionFile = path.join(ws, ".version");
-  let workspaceVersion = "";
-  if (fs.existsSync(versionFile)) {
-    workspaceVersion = String(fs.readFileSync(versionFile, "utf8") || "").trim();
-  }
+  const readWsVersion = () => {
+    try {
+      return String(fs.readFileSync(versionFile, "utf8") || "").trim();
+    } catch {
+      return "";
+    }
+  };
 
-  if (workspaceVersion !== APP_VERSION) {
-    console.log("Workspace update needed:", workspaceVersion, "→", APP_VERSION);
+  // ===== DEV: immer komplett neu =====
+  if (isDev) {
+    console.log("DEV: Recreate workspace fresh every start");
 
-    // Workspace neu erstellen
     fs.rmSync(ws, { recursive: true, force: true });
     fs.mkdirSync(ws, { recursive: true });
 
-    // Version schreiben
-    fs.writeFileSync(versionFile, APP_VERSION, "utf8");
+    const defaults = getDefaultsDir();
+
+    // dev: alles frisch (code + presets)
+    copyForce(path.join(defaults, "code", "server.js"),          path.join(ws, "server.js"));
+    copyForce(path.join(defaults, "code", "control.html"),       path.join(ws, "control.html"));
+    copyForce(path.join(defaults, "code", "overlay.html"),       path.join(ws, "overlay.html"));
+    copyForce(path.join(defaults, "code", "translations.json"),  path.join(ws, "translations.json"));
+
+    copyForce(path.join(defaults, "presets", "lt_presets.json"), path.join(ws, "lt_presets.json"));
+    copyForce(path.join(defaults, "presets", "ci_profiles.json"), path.join(ws, "ci_profiles.json"));
+
+    // optional: dev kann .version schreiben oder nicht – hier: nicht nötig
+    return ws;
   }
+
+  // ===== RELEASE: nur updaten wenn Version anders =====
+  ensureDir(ws);
+  const workspaceVersion = readWsVersion();
+  const isUpdate = (workspaceVersion !== APP_VERSION);
 
   const defaults = getDefaultsDir();
 
-  // code
-  copyIfMissing(path.join(defaults, "code", "server.js"),   path.join(ws, "server.js"));
-  copyIfMissing(path.join(defaults, "code", "control.html"), path.join(ws, "control.html"));
-  copyIfMissing(path.join(defaults, "code", "overlay.html"), path.join(ws, "overlay.html"));
+  if (isUpdate) {
+    console.log("RELEASE: Workspace update needed:", workspaceVersion, "→", APP_VERSION);
 
-  // presets
-  copyIfMissing(path.join(defaults, "presets", "lt_presets.json"), path.join(ws, "lt_presets.json"));
-  copyIfMissing(path.join(defaults, "presets", "ci_profiles.json"), path.join(ws, "ci_profiles.json"));
+    // ✅ Code aktualisieren
+    copyForce(path.join(defaults, "code", "server.js"),          path.join(ws, "server.js"));
+    copyForce(path.join(defaults, "code", "control.html"),       path.join(ws, "control.html"));
+    copyForce(path.join(defaults, "code", "overlay.html"),       path.join(ws, "overlay.html"));
+    copyForce(path.join(defaults, "code", "translations.json"),  path.join(ws, "translations.json"));
+
+    // ✅ Presets NIE überschreiben, nur falls fehlend
+    copyIfMissing(path.join(defaults, "presets", "lt_presets.json"), path.join(ws, "lt_presets.json"));
+    copyIfMissing(path.join(defaults, "presets", "ci_profiles.json"), path.join(ws, "ci_profiles.json"));
+
+    // ✅ Version nur dann hochsetzen, wenn Update wirklich gemacht wurde
+    fs.writeFileSync(versionFile, APP_VERSION, "utf8");
+  } else {
+    // Kein Update → Presets trotzdem sicherstellen (aber nicht überschreiben)
+    copyIfMissing(path.join(defaults, "presets", "lt_presets.json"), path.join(ws, "lt_presets.json"));
+    copyIfMissing(path.join(defaults, "presets", "ci_profiles.json"), path.join(ws, "ci_profiles.json"));
+
+    // .version sollte existieren (z.B. erster Start) – aber nicht "faken"
+    if (!fs.existsSync(versionFile)) {
+      fs.writeFileSync(versionFile, APP_VERSION, "utf8");
+    }
+  }
 
   return ws;
 }
 
 
 
+
 function ensureDir(p) {
   if (!fs.existsSync(p)) fs.mkdirSync(p, { recursive: true });
-}
-
-function copyIfMissing(src, dst) {
-  if (!fs.existsSync(dst)) fs.copyFileSync(src, dst);
 }
 
 function getDefaultsDir() {

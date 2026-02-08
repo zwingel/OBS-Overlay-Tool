@@ -1,21 +1,38 @@
 {
+  "meta": {
+    "fallback": "en",
+    "languages": [
+      { "code": "de", "label": "Deutsch" },
+      { "code": "en", "label": "English" }
+    ]
+  },
+
   "de": {
     "title": "Control Panel",
     "status_connected": "Verbunden",
     "status_disconnected": "Getrennt",
     "open_overlay": "Overlay öffnen",
     "sync": "Sync",
+
     "lt_left": "Lower Third – Links",
     "lt_right": "Lower Third – Rechts",
+    "preset": "Preset",
     "name": "Name",
     "subtitle": "Untertitel",
-    "preset": "Preset",
+    "top": "Top",
+    "bottom": "Bottom",
+    "text": "Text",
+    "auto_hide": "Auto-Hide (s)",
+
     "btn_load": "Laden",
     "btn_save": "Speichern",
     "btn_delete": "Löschen",
     "btn_apply": "Übernehmen",
     "btn_show": "Einblenden",
     "btn_hide": "Ausblenden",
+    "btn_set": "Setzen",
+
+
     "scoreboard": "Scoreboard",
     "on": "Ein",
     "off": "Aus",
@@ -23,32 +40,77 @@
     "team1": "Team 1",
     "team2": "Team 2",
     "color": "Farbe",
-    "text": "Text",
     "set": "Setzen",
+
     "clock_toggle": "Uhr An/Aus",
     "start_stop": "Start/Stop",
+    "start_time": "Startzeit (mm:ss)",
+
     "timer": "Timer",
+    "countdown": "Countdown",
+    "countup": "Countup",
+    "label": "Label",
+    "seconds": "Sekunden",
+    "ring": "Ring",
+    "x": "X",
+    "y": "Y",
+    "optional_bg": "BG optional",
+    "remove_bg": "BG entfernen",
+
     "scaling": "Skalierung",
-    "ci_defaults": "CI Standards",
-    "reset_section": "System zurücksetzen"
+    "lower_thirds": "Lower Thirds",
+
+    "ci_defaults": "CI Standards (Lower Third Top/Bottom + Timer Ring)",
+    "profile_name": "Profilname",
+    "existing_profiles": "Vorhanden",
+    "primary_color": "Primary (LT Top + Timer Ring)",
+    "secondary_color": "Secondary (LT Bottom)",
+    "ci_note": "„Load → Picker“ setzt nur die Color-Picker (Voreinstellung). Erst mit „Übernehmen“ werden Farben live ans Overlay gesendet.",
+
+    "lower_third_slots": "Lower Third Slots (8 Presets)",
+    "slot": "Slot",
+    "choose_preset": "-- Preset wählen --",
+    "side_left": "Links",
+    "side_right": "Rechts",
+    "show": "Show",
+    "hide": "Hide",
+
+    "code_reset": "Code Reset (HTML/JS/Server)",
+    "preset_reset": "Preset Reset (LT/CI)",
+    "backup_note": "Backups landen in <code>workspace/_backups</code>",
+
+    "ph_preset_example": "z.B. Partei A",
+    "ph_label_example": "z.B. PAUSE",
+    "ph_profile_example": "z.B. Lokalzeitung",
+    "ph_clock_example": "45:00"
   },
+
   "en": {
     "title": "Control Panel",
     "status_connected": "Connected",
     "status_disconnected": "Disconnected",
     "open_overlay": "Open Overlay",
     "sync": "Sync",
+
     "lt_left": "Lower Third – Left",
     "lt_right": "Lower Third – Right",
+    "preset": "Preset",
     "name": "Name",
     "subtitle": "Subtitle",
-    "preset": "Preset",
+    "top": "Top",
+    "bottom": "Bottom",
+    "text": "Text",
+    "auto_hide": "Auto-Hide (s)",
+
     "btn_load": "Load",
     "btn_save": "Save",
     "btn_delete": "Delete",
     "btn_apply": "Apply",
     "btn_show": "Show",
     "btn_hide": "Hide",
+    "btn_set": "Set",
+
+
     "scoreboard": "Scoreboard",
     "on": "On",
     "off": "Off",
@@ -56,13 +118,48 @@
     "team1": "Team 1",
     "team2": "Team 2",
     "color": "Color",
-    "text": "Text",
     "set": "Set",
-    "clock_toggle": "Clock Toggle",
+
+    "clock_toggle": "Clock On/Off",
     "start_stop": "Start/Stop",
+    "start_time": "Start time (mm:ss)",
+
     "timer": "Timer",
+    "countdown": "Countdown",
+    "countup": "Countup",
+    "label": "Label",
+    "seconds": "Seconds",
+    "ring": "Ring",
+    "x": "X",
+    "y": "Y",
+    "optional_bg": "Optional BG",
+    "remove_bg": "Remove BG",
+
     "scaling": "Scaling",
-    "ci_defaults": "CI Defaults",
-    "reset_section": "System Reset"
+    "lower_thirds": "Lower Thirds",
+
+    "ci_defaults": "CI Defaults (Lower Third Top/Bottom + Timer Ring)",
+    "profile_name": "Profile name",
+    "existing_profiles": "Existing",
+    "primary_color": "Primary (LT Top + Timer Ring)",
+    "secondary_color": "Secondary (LT Bottom)",
+    "ci_note": "\"Load → Picker\" only sets the color pickers (defaults). Use \"Apply\" to send the colors live to the overlay.",
+
+    "lower_third_slots": "Lower Third Slots (8 Presets)",
+    "slot": "Slot",
+    "choose_preset": "-- Choose preset --",
+    "side_left": "Left",
+    "side_right": "Right",
+    "show": "Show",
+    "hide": "Hide",
+
+    "code_reset": "Code Reset (HTML/JS/Server)",
+    "preset_reset": "Preset Reset (LT/CI)",
+    "backup_note": "Backups go to <code>workspace/_backups</code>",
+
+    "ph_preset_example": "e.g. Party A",
+    "ph_label_example": "e.g. BREAK",
+    "ph_profile_example": "e.g. Local newspaper",
+    "ph_clock_example": "45:00"
   }
 }
